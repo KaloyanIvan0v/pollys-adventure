@@ -1,0 +1,1 @@
+class CardCannon extends ThrowableObject {}

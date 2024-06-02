@@ -1,0 +1,138 @@
+class Character extends MovableObject {
+  IMAGES_WALKING = [
+    "/img/characters/dog/walk/005-005.png",
+    "/img/characters/dog/walk/005-006.png",
+    "/img/characters/dog/walk/005-007.png",
+    "/img/characters/dog/walk/005-007.png",
+    "/img/characters/dog/walk/005-009.png",
+    "/img/characters/dog/walk/005-010.png",
+  ];
+
+  IMAGES_DEATH = [
+    "/img/characters/dog/death/002-003.png",
+    "/img/characters/dog/death/002-004.png",
+    "/img/characters/dog/death/002-005.png",
+    "/img/characters/dog/death/002-006.png",
+  ];
+
+  IMAGES_IDLE = [
+    "/img/characters/dog/idle/004-000.png",
+    "/img/characters/dog/idle/004-001.png",
+    "/img/characters/dog/idle/004-002.png",
+    "/img/characters/dog/idle/004-003.png",
+  ];
+
+  IMAGES_JUMP_UP = ["/img/characters/dog/walk/005-009.png", "/img/characters/dog/walk/005-009.png"];
+  IMAGES_JUMP_DOWN = [
+    "/img/characters/dog/walk/005-006.png",
+    "/img/characters/dog/walk/005-006.png",
+  ];
+
+  //jump_sound = new Audio("/audio/jump.mp3");
+  world;
+  walking_sound = new Audio("/audio/dog-runs.mp3");
+  jump_sound = new Audio("/audio/dog-jump.mp3");
+  idle_sound = new Audio("/audio/dog-breath.mp3");
+  greetingSound = new Audio("/audio/dog/dog-start-game-sound.wav");
+  walking;
+  alreadyWalking = false;
+  canTakeDamage = true;
+
+  constructor() {
+    super().loadImg("/img/characters/dog/idle/004-000.png");
+    this.loadImages(this.IMAGES_IDLE);
+    this.loadImages(this.IMAGES_WALKING);
+    this.loadImages(this.IMAGES_DEATH);
+    this.animate();
+    this.applyGravity(40);
+    this.y = 280;
+    this.playSound(this.greetingSound);
+  }
+
+  animate() {
+    setInterval(() => {
+      this.handleCharacterMovement();
+      this.setPlayerViewPoint(115);
+    }, 1000 / 60);
+
+    setInterval(() => {
+      setTimeout(this.handleCharacterAnimation(), this.animationSpeed);
+    }, 20);
+  }
+
+  handleCharacterMovement() {
+    if (this.world.keyboard.LEFT && this.x > -500) {
+      this.moveLeft(8, true);
+      this.playSound(this.walking_sound);
+      this.stopSound(this.idle_sound);
+    } else if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
+      this.moveRight(8);
+      this.playSound(this.walking_sound);
+      this.stopSound(this.idle_sound);
+    } else {
+      this.stopSound(this.walking_sound);
+      this.playSound(this.idle_sound, 0.0);
+    }
+    if (this.world.keyboard.SPACE && !this.isAboveGround()) {
+      this.playSound(this.jump_sound);
+      this.stopSound(this.idle_sound);
+      this.jump();
+    }
+  }
+  handleCharacterAnimation() {
+    if (this.isDead()) {
+      this.deathAnimation();
+    } else if (this.isJump()) {
+      this.jumpAnimation();
+    } else {
+      if (this.characterMovesLeftOrRight()) {
+        this.characterIsColliding()
+          ? this.playAnimationHurt(this.IMAGES_WALKING, 80)
+          : this.playAnimation(this.IMAGES_WALKING, 80);
+      } else {
+        this.characterIsColliding()
+          ? this.playAnimationHurt(this.IMAGES_IDLE, 240)
+          : this.playAnimation(this.IMAGES_IDLE, 240);
+      }
+    }
+  }
+  setPlayerViewPoint(position_x) {
+    this.world.camera_x = -this.x + position_x;
+  }
+
+  hurt(harmful) {
+    if (this.energy > 5 && harmful) {
+      this.energy = this.energy - 1.5;
+    }
+  }
+
+  deathAnimation() {
+    this.currentImg = 0;
+    if (!this.alreadyDead) {
+      for (let i = 0; i < this.IMAGES_DEATH.length; i++) {
+        this.playAnimation(this.IMAGES_DEATH, 0);
+      }
+      this.alreadyDead = true;
+    }
+  }
+
+  jumpAnimation() {
+    if (this.speedY > 0) {
+      this.characterIsColliding()
+        ? this.playAnimationHurt(this.IMAGES_JUMP_UP, 150)
+        : this.playAnimation(this.IMAGES_JUMP_UP, 200);
+    } else {
+      this.characterIsColliding()
+        ? this.playAnimationHurt(this.IMAGES_JUMP_DOWN, 150)
+        : this.playAnimation(this.IMAGES_JUMP_DOWN, 200);
+    }
+  }
+
+  characterMovesLeftOrRight() {
+    return this.world.keyboard.RIGHT || this.world.keyboard.LEFT ? true : false;
+  }
+
+  characterIsColliding() {
+    return this.currentCollisionState;
+  }
+}
