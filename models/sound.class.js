@@ -1,26 +1,15 @@
 class Sound {
-  volume = 0;
-  muter = 1;
-  character;
-  obj;
+  distanceVolume = 1;
+  constructor() {}
 
-  constructor(character, obj) {
-    this.character = character;
-    this.obj = obj;
+  adjustSoundVolumeByDistance(targetObj, obj) {
+    if (!obj.alreadyDead) {
+      this.adjustSoundVolumeByDistanceHelper(targetObj, obj);
+    }
   }
 
-  adjustSoundVolumeByDistance() {
-    this.obj.forEach((enemy) => {
-      if (!enemy.alreadyDead) {
-        this.adjustSoundVolumeByDistanceHelper(enemy);
-      }
-    });
-  }
-
-  adjustSoundVolumeByDistanceHelper(enemy) {
-    let distance = Math.sqrt(
-      Math.pow(this.character.x - enemy.x, 2) + Math.pow(this.character.y - enemy.y, 2)
-    );
+  adjustSoundVolumeByDistanceHelper(targetObj, obj) {
+    let distance = Math.sqrt(Math.pow(targetObj.x - obj.x, 2));
     if (distance <= 650) {
       let volume;
       if (distance > 100) {
@@ -28,20 +17,29 @@ class Sound {
       } else {
         volume = 1;
       }
-      enemy.volume = volume;
+      obj.distanceVolume = volume;
     } else {
-      enemy.volume = 0;
+      obj.distanceVolume = 0;
     }
   }
 
-  playSound(sound, volume) {
+  playSound(sound, objVolume, soundVolume) {
     if (sound) {
-      if (volume === undefined) {
-        volume = 1;
+      if (objVolume === undefined) {
+        objVolume = 1;
       }
-      sound.volume = volume * this.volume * this.muter;
-
-      //sound.play();
+      if (soundVolume === undefined) {
+        soundVolume = 1;
+      }
+      sound.volume = soundVolume * objVolume * this.distanceVolume;
+      if (!muteSound && sound.paused) {
+        activeSounds.push(sound);
+        sound.play();
+      } else {
+        if (muteSound) {
+          sound.pause();
+        }
+      }
     }
   }
 

@@ -13,27 +13,36 @@
   <script src="/models/drawable-objects.class.js"></script>
   <script src="/models/movable-objects.class.js"></script>
   <script src="/models/throwable-objects.class.js"></script>
+  <script src="/models/GUI/start-screen.class.js"></script>
+  <script src="/models/mouse.class.js"></script>
   <script src="/models/bomb.class.js"></script>
+  <script src="/models/box.class.js"></script>
   <script src="/models/ground.class.js"></script>
   <script src="/models/card-cannon.class.js"></script>
   <script src="/models/status-bar.class.js"></script>
+  <script src="/models/button.class.js"></script>
   <script src="/models/background-objects.js"></script>
   <script src="/models/character.class.js"></script>
   <script src="/models/small-enemy.class.js"></script>
   <script src="/models/drone.class.js"></script>
   <script src="/models/world.class.js"></script>
+  <script src="/models/GUI/game_menu.class.js"></script>
   <script src="/models/keyboard.class.js"></script>
   <script src="/models/level.class.js"></script>
   <script src="/models/endboss.class.js"></script>
+  <script src="/models/endscreen.class.js"></script>
   <script src="/levels/level1.js"></script>
   <script src="/js/game.js"></script>
 
 </head>
 
-<body>
-  <h1>Polly's Adventure</h1>
-  <canvas id="canvas" width="720px" height="480px"></canvas>
-  <div id="start-button" class="start-button" onclick="startGame()">Start Game</div>
+<body onload="init()">
+  <img class="headline-img" src="/img/background/background-img/Polly`s.png" alt="">
+  <canvas id="canvas" width="720px" height="480px">
+  </canvas>
+  <img class="dog-background" src="/img/background/background-img/dog.png" alt="">
+  <img class="enemy-big-background" src="/img/background/background-img/enemy-big.png" alt="">
+  <img class="enemy-small-background" src="/img/background/background-img/enemy-small.png" alt="">
 </body>
 
 </html>

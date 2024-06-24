@@ -2,12 +2,15 @@ class DrawableObject extends Sound {
   img;
   imgCache = {};
   currentImg = 0;
+  playedAnimationOnce = false;
+  startRenderImgAmount = 0;
   x = 100;
   y = 358;
   height = 72;
   width = 72;
   lastFrameTime = Date.now();
   harmful = false;
+  collectable = false;
 
   constructor() {
     super();
@@ -62,5 +65,9 @@ class DrawableObject extends Sound {
     if (index > -1) {
       objectArray.splice(index, 1);
     }
+  }
+
+  calculateDistance(obj, targetObj) {
+    return Math.sqrt(Math.pow(obj.x - targetObj.x, 2) + Math.pow(obj.y - targetObj.y, 2));
   }
 }

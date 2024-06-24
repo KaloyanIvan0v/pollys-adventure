@@ -16,55 +16,52 @@ class SmallEnemy extends MovableObject {
   ];
 
   deadSound = new Audio("/audio/enemy/small/dead.mp3");
-  walkSound = new Audio("/audio/enemy/small/walk.mp3");
+  movingSound = new Audio("/audio/enemy/small/walk.mp3");
 
   constructor() {
     super().loadImg("/img/characters/enemy/small/walk/1.png");
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_DEAD);
-    this.x = 300 + Math.random() * 4000;
-    this.speed = 0.2 + Math.random() * 0.5;
+    this.setRandomXPosition();
+    this.setRandomXSpeed();
     this.height = 60;
     this.width = 60;
     this.y = 372;
     this.harmful = true;
-    this.animate();
+    this.speedX = 0.15;
   }
 
-  animate() {
-    setInterval(() => {
-      this.moveLeft(1, true);
-    }, 1000 / 60);
+  animate(targetObj) {
+    this.handleObjMovement();
+    this.handleObjAnimation();
+    this.adjustSoundVolumeByDistance(targetObj, this);
+  }
 
-    setInterval(() => {
-      if (this.isDead()) {
-        if (!this.alreadyDead) {
-          if (this.currentImg % this.IMAGES_DEAD.length < 4) {
-            this.playAnimation(this.IMAGES_DEAD, 10);
-          } else {
-            this.alreadyDead = true;
-            this.stopSound(this.walkSound);
-          }
-        }
-      } else {
-        this.playAnimation(this.IMAGES_WALKING, 120);
-        this.playSound(this.walkSound);
-      }
-    }, 120);
+  handleObjMovement() {
+    this.moveLeft(1, true);
+  }
+
+  handleObjAnimation() {
+    if (this.isDead()) {
+      this.playAnimationOnce(this.IMAGES_DEAD, 55, this.movingSound);
+    } else {
+      this.playAnimation(this.IMAGES_WALKING, 120);
+      this.playSound(this.movingSound, 1, soundVolumeGame);
+    }
   }
 
   hitFromTop() {
-    this.speed = 0;
+    this.speedX = 0;
     this.width = 60;
     this.height = 60;
     this.animate(this.IMAGES_DEAD, 120);
   }
 
   kill() {
-    this.playSound(this.deadSound);
-    this.currentImg = 0;
-    this.harmful = false;
+    this.playSound(this.deadSound, 1, soundVolumeGame);
     this.energy = 0;
-    this.speed = 0;
+    this.speedX = 0;
+    this.collectable = true;
+    this.harmful = false;
   }
 }

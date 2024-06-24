@@ -1,44 +1,100 @@
-class World {
+class World extends Sound {
   ctx;
   canvas;
   keyboard;
   camera_x = 0;
   level = level1;
+
   character = new Character();
   statusBar = new StatusBar();
+  gameMenu = new GameMenu(0, 0);
+
   throwableObjects = [];
   collidingEnemies = [];
   backgroundObjects = level1.backgroundObjects;
   alreadyThrown = false;
   lastCtxTranslate = 1;
-  lastDropTime = 0;
-  randomDropBombDelay = 1000;
-  soundAdjusterEnemies;
-  drone;
+  backgroundMusic = new Audio("/audio/mysterious-melody-loop-197040.mp3");
+  endScreen = new EndScreen();
+  //END_SCREEN = ["/img/GUI/end-screen.png"];
+  //endScreen = new BackgroundObject(this.END_SCREEN, 0, 0, 480, 720);
 
   constructor(canvas, keyboard) {
-    this.level.drones.push(new Drone(this));
+    super();
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
     this.draw();
     this.setWorld();
-    this.eventLoop();
-    this.soundAdjusterEnemies = new Sound(this.character, this.level.enemies);
-    this.soundAdjusterThrowableObjects = new Sound(this.character, this.throwableObjects);
+    this.gameLoop();
   }
 
-  eventLoop() {
+  gameLoop() {
     setInterval(() => {
-      this.characterCheckCollisions();
-      this.checkThrowableObjects();
-      this.areaDamage();
-      this.checkIfTisUp();
-      this.removeExplodedThrownObjects();
-      this.initDropBomb();
-      this.soundAdjusterEnemies.adjustSoundVolumeByDistance();
-      this.soundAdjusterThrowableObjects.adjustSoundVolumeByDistance();
-    }, 25);
+      if (!holdWorld) {
+        if (!gamePaused) {
+          this.animateObjects();
+          this.worldEvents();
+        }
+        this.draw();
+        this.guiEvents();
+      } else {
+        this.drawEndScreen();
+      }
+    }, 1000 / 166);
+  }
+
+  animateObjects() {
+    this.animateDrones();
+    this.animateEnemies();
+    this.character.animate();
+  }
+
+  worldEvents() {
+    this.character.CheckCollisionsWith();
+    this.checkThrowableObjects();
+    this.character.areaDamage(this.throwableObjects);
+    this.checkIfTisUp();
+    this.removeExplodedThrownObjects();
+    this.level.drones[0].initDropBomb(this);
+    this.updateStatusBars();
+    this.checkIfGameEnded();
+  }
+
+  guiEvents() {
+    this.character.playSound(this.backgroundMusic, 0.06, soundVolumeGUI);
+    this.gameMenu.animate();
+  }
+
+  restartGame() {
+    this.enemies = [];
+    this.throwableObjects = [];
+    activeSounds.forEach((sound) => {
+      sound.pause();
+      sound.currentTime = 0;
+    });
+    this.level = new Level(1, 1);
+    this.character.resetCharacter();
+    gamePaused = false;
+    soundVolumeGame = 1;
+  }
+
+  updateStatusBars() {
+    this.statusBar.setPercentage(this.character.energy);
+  }
+
+  animateEnemies() {
+    this.level.enemies.forEach((enemy) => {
+      if (enemy instanceof SmallEnemy) {
+        enemy.animate(this.character);
+      }
+    });
+  }
+
+  animateDrones() {
+    this.level.drones.forEach((drone) => {
+      drone.animate(this.character);
+    });
   }
 
   removeExplodedThrownObjects() {
@@ -67,59 +123,18 @@ class World {
     }
   }
 
-  isItJumpOnEnemy(enemy) {
-    if (
-      this.character.y + this.character.height < enemy.y + enemy.height * 0.8 &&
-      this.character.speedY <= 0
-    ) {
-      enemy.kill();
-    }
-  }
-
-  characterCheckCollisions() {
-    this.character.collisionDetected = false;
-    this.level.enemies.forEach((enemy) => {
-      if (this.character.isColliding(enemy)) {
-        this.isItJumpOnEnemy(enemy);
-        this.statusBar.setPercentage(this.character.energy);
-        if (!this.character.isAboveGround()) {
-          this.character.hurt(enemy.harmful);
-        }
-        enemy.harmful ? (this.character.collisionDetected = true) : null;
-      }
-    });
-    this.character.currentCollisionState = this.character.collisionDetected;
-  }
-
-  characterIsNotOnGround() {}
-
   setWorld() {
     this.character.world = this;
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawParallaxBackgroundLayers();
-
-    //area for fixed objects on the screen
-    this.addToMap(this.statusBar);
-    //end of area for fixed objects on the screen
-
-    this.ctx.translate(this.camera_x, 0);
-    this.addObjToMap(this.level.drones);
-    this.addObjToMap(this.level.enemies);
-    this.addToMap(this.character);
-    this.addObjToMap(this.throwableObjects);
-    this.ctx.translate(-this.camera_x, 0);
-
-    this.setAnimationLoop();
+    this.drawDynamicObjects();
+    this.drawFixedObjects();
   }
 
-  setAnimationLoop() {
-    let self = this;
-    requestAnimationFrame(function () {
-      self.draw();
-    });
+  drawEndScreen() {
+    // this.addToMap(this.endScreen);
+    this.endScreen.draw(this.ctx);
   }
 
   drawParallaxBackgroundLayers() {
@@ -128,6 +143,24 @@ class World {
     this.drawObjectWithCameraOffset(this.level.backgroundObjects3, 0.6);
     this.drawObjectWithCameraOffset(this.level.backgroundObjects4, 0.8);
     this.drawObjectWithCameraOffset(this.level.backgroundObjects5, 1);
+  }
+
+  drawDynamicObjects() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawParallaxBackgroundLayers();
+    this.ctx.translate(this.camera_x, 0);
+    this.addObjToMap(this.level.drones);
+    this.addObjToMap(this.level.enemies);
+    this.addToMap(this.character);
+    this.addObjToMap(this.throwableObjects);
+    this.ctx.translate(-this.camera_x, 0);
+  }
+
+  drawFixedObjects() {
+    this.addToMap(this.statusBar);
+    this.gameMenu.returnButtons().forEach((button) => {
+      this.addToMap(button);
+    });
   }
 
   drawObjectWithCameraOffset(obj, position_x_Offset) {
@@ -143,55 +176,17 @@ class World {
   }
 
   addToMap(movableObj) {
-    movableObj.drawFrame(this.ctx, "yellow");
-    if (movableObj.otherDirection) {
+    // movableObj.drawFrame(this.ctx, "yellow");
+    if (movableObj.flipImg) {
       movableObj.flipImgHorizontally(this.ctx);
     }
     movableObj.draw(this.ctx);
     movableObj.flipImgHorizontallyBack(this.ctx);
   }
 
-  droneDropBomb() {
-    const now = Date.now();
-    if (now - this.lastDropTime >= 5000) {
-      this.level.drones.forEach((drone) => {
-        drone.dropBomb(drone, this.throwableObjects);
-        this.randomDropBombDelay = 5000 + Math.random() * 5000;
-      });
-      this.lastDropTime = now;
+  checkIfGameEnded() {
+    if (this.character.alreadyDead) {
+      holdWorld = true;
     }
-  }
-
-  initDropBomb() {
-    const now = Date.now();
-    if (now - this.lastDropTime >= this.randomDropBombDelay) {
-      this.droneDropBomb();
-    }
-  }
-
-  areaDamage() {
-    const explosionRadius = 90;
-    const damage = 50;
-
-    this.throwableObjects.forEach((obj) => {
-      if (!obj.isAboveGround()) {
-        const distance = Math.sqrt(
-          Math.pow(obj.x - this.character.x, 2) + Math.pow(obj.y - this.character.y, 2)
-        );
-        if (distance <= explosionRadius && this.character.canTakeDamage && obj.harmful) {
-          this.character.energy -= damage;
-          this.statusBar.setPercentage(this.character.energy);
-          this.character.canTakeDamage = false;
-
-          setTimeout(() => {
-            this.character.canTakeDamage = true;
-          }, 5000);
-
-          if (this.character.energy <= 0) {
-            this.character.alreadyDead = true;
-          }
-        }
-      }
-    });
   }
 }

@@ -12,6 +12,7 @@ class Bomb extends ThrowableObject {
   }
 
   bomb_explosion = new Audio("/audio/objects/bomb/bomb-explosion.mp3");
+  bomb_hit_slime = new Audio("/audio/enemy/small/dead.mp3");
 
   constructor(x, y, speedX, speedY, fallSpeed, world) {
     super(x, y, speedX, speedY, fallSpeed);
@@ -23,31 +24,12 @@ class Bomb extends ThrowableObject {
     this.height = 35;
     this.width = 35;
     setInterval(() => {
-      this.ifBombHitGround();
-      this.animate();
-    }, 1000 / 30);
-  }
-
-  ifBombHitGround() {
-    if (!this.isAboveGround() && !this.ifBombFallOnSlime()) {
-      this.playSound(this.bomb_explosion, 0.3);
-      this.y = 400;
-      this.energy = 0;
-      setTimeout(() => {
-        this.harmful = false;
-      }, 400);
-    } else {
-    }
-  }
-
-  ifBombFallOnSlime() {
-    let bombOnSlime = false;
-    this.world.level.enemies.forEach((enemy) => {
-      if (this.isColliding(enemy)) {
-        enemy.alreadyDead ? (bombOnSlime = true) : (bombOnSlime = false);
+      if (!gamePaused) {
+        this.ifBombHitGround();
+        this.animate();
+        this.adjustSoundVolumeByDistance(this.world.character, this);
       }
-    });
-    return bombOnSlime;
+    }, 1000 / 30);
   }
 
   animate() {
@@ -61,6 +43,37 @@ class Bomb extends ThrowableObject {
         this.stopSound(this.bomb_explosion);
       }
     }
+  }
+
+  ifBombHitGround() {
+    if (!this.isAboveGround() && !this.ifBombFallOnSlime() && this.harmful) {
+      this.playSound(this.bomb_explosion, 0.3, soundVolumeGame);
+      this.y = 400;
+      this.energy = 0;
+      setTimeout(() => {
+        this.harmful = false;
+      }, 400);
+    } else {
+      if (this.ifBombFallOnSlime()) {
+        if (this.harmful) {
+          this.y = 430 - this.height;
+          this.playSound(this.bomb_hit_slime, 1, soundVolumeGame);
+        }
+        this.harmful = false;
+      }
+    }
+  }
+
+  ifBombFallOnSlime() {
+    let bombOnSlime = false;
+    this.world.level.enemies.forEach((enemy) => {
+      if (this.isColliding(enemy)) {
+        if (this.x > enemy.x && this.x + this.width < enemy.x + enemy.width) {
+          enemy.alreadyDead ? (bombOnSlime = true) : (bombOnSlime = false);
+        }
+      }
+    });
+    return bombOnSlime;
   }
 
   animateExplode() {
