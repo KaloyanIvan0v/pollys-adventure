@@ -54,8 +54,10 @@ class Character extends MovableObject {
   }
 
   resetCharacter() {
+    this.alreadyDead = false;
     this.energy = 100;
     this.speedY = 0;
+    this.speedX = 0.14;
     this.flipImg = false;
     this.x = 100;
     this.y = 280;

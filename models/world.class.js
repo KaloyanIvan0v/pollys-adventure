@@ -16,8 +16,7 @@ class World extends Sound {
   lastCtxTranslate = 1;
   backgroundMusic = new Audio("/audio/mysterious-melody-loop-197040.mp3");
   endScreen = new EndScreen();
-  //END_SCREEN = ["/img/GUI/end-screen.png"];
-  //endScreen = new BackgroundObject(this.END_SCREEN, 0, 0, 480, 720);
+  intervalId;
 
   constructor(canvas, keyboard) {
     super();
@@ -27,21 +26,45 @@ class World extends Sound {
     this.draw();
     this.setWorld();
     this.gameLoop();
+    this.resizeListener();
+  }
+
+  resizeListener() {
+    window.addEventListener("resize", () => {
+      this.buttonResizeUpdate();
+      console.log("resize");
+    });
+  }
+
+  buttonResizeUpdate() {
+    setTimeout(() => {
+      this.gameMenu = new GameMenu(0, 0);
+      this.endScreen = new EndScreen();
+    }, 200);
   }
 
   gameLoop() {
-    setInterval(() => {
+    this.intervalId = setInterval(() => {
       if (!holdWorld) {
         if (!gamePaused) {
           this.animateObjects();
           this.worldEvents();
+          gameLoopTicks = gameLoopTicks + 1;
         }
         this.draw();
         this.guiEvents();
       } else {
         this.drawEndScreen();
+        this.stopAllSounds();
       }
     }, 1000 / 166);
+  }
+
+  stopGameLoop() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
   }
 
   animateObjects() {
@@ -67,16 +90,20 @@ class World extends Sound {
   }
 
   restartGame() {
-    this.enemies = [];
+    this.level = new Level(3, 1);
     this.throwableObjects = [];
+    this.enemies = [];
+    this.stopAllSounds();
+    this.character.resetCharacter();
+    gamePaused = false;
+    soundVolumeGame = 1;
+  }
+
+  stopAllSounds() {
     activeSounds.forEach((sound) => {
       sound.pause();
       sound.currentTime = 0;
     });
-    this.level = new Level(1, 1);
-    this.character.resetCharacter();
-    gamePaused = false;
-    soundVolumeGame = 1;
   }
 
   updateStatusBars() {
@@ -133,8 +160,8 @@ class World extends Sound {
   }
 
   drawEndScreen() {
-    // this.addToMap(this.endScreen);
     this.endScreen.draw(this.ctx);
+    this.endScreen.animate();
   }
 
   drawParallaxBackgroundLayers() {

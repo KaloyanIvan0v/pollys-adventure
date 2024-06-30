@@ -10,14 +10,43 @@ let gameRuns = false;
 let holdWorld = false;
 let activeSounds = [];
 let gameMenu = false;
+let gameLoopTicks = 0;
+let fullscreen = false;
+let canvasDimensions = { width: 720, height: 480 };
+let canvasRect = { top: 0, left: 0 };
+let lastScreenOrientation;
 
 function init() {
+  //configUserDevice();
+  updateCanvasData();
   loadStartScreen();
 }
 
+function toggleFullscreen() {
+  !fullscreen ? enterFullScreen() : exitFullScreen();
+  setTimeout(() => {
+    world.buttonResizeUpdate();
+  }, 20);
+}
+
+function playAgain() {
+  holdWorld = false;
+  reload();
+}
+
+function backHome() {
+  world.stopGameLoop();
+  level1 = new Level(3, 1);
+  loadStartScreen();
+  holdWorld = false;
+  muteSound = true;
+}
+
 function startGame() {
+  startScreen.stopLoop();
   loadGame();
   muteSound = false;
+  ScreenOrientationListener();
 }
 
 function reload() {
@@ -29,15 +58,16 @@ function toggleGameMenu() {
 }
 
 function loadStartScreen() {
+  gameRuns = false;
   canvas = document.getElementById("canvas");
   startScreen = new StartScreen(canvas, keyboard);
   mouse = new Mouse(canvas);
 }
 
 function loadGame() {
-  gameRuns = true;
   canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
+  gameRuns = true;
 }
 
 function toggleSound() {
@@ -53,6 +83,20 @@ function togglePlayPause() {
     soundVolumeGame = 1;
   } else {
     soundVolumeGame = 0;
+  }
+}
+
+function enterFullScreen() {
+  if (this.canvas.requestFullscreen) {
+    this.canvas.requestFullscreen();
+    fullscreen = true;
+  }
+}
+
+function exitFullScreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+    fullscreen = false;
   }
 }
 
@@ -72,6 +116,9 @@ window.addEventListener("keydown", (e) => {
   if (e.code === "KeyT") {
     keyboard.T = true;
   }
+  if (e.code === "KeyEsc") {
+    keyboard.ESC = true;
+  }
 });
 
 window.addEventListener("keyup", (e) => {
@@ -89,5 +136,8 @@ window.addEventListener("keyup", (e) => {
   }
   if (e.code === "KeyT") {
     keyboard.T = false;
+  }
+  if (e.code === "KeyEsc") {
+    keyboard.ESC = false;
   }
 });

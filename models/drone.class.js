@@ -14,6 +14,7 @@ class Drone extends MovableObject {
   randomDropBombDelay = 1000;
   horizontalSpeedDrone = 0.48;
   drone_fly = new Audio("/audio/enemy/drone/1.mp3");
+  lastDropTick = 0;
 
   constructor() {
     super().loadImg("/img/characters/drone/idle/004-000.png");
@@ -46,33 +47,32 @@ class Drone extends MovableObject {
 
   dropBomb(world) {
     this.speedX = 0;
-    const dropTime = Date.now();
-    requestAnimationFrame(() => (!gamePaused ? this.checkAndResume(world, dropTime) : null));
+    const dropTick = gameLoopTicks;
+    this.checkAndResume(world, dropTick);
   }
 
-  checkAndResume(world, dropTime) {
-    const elapsedTime = Date.now() - dropTime;
-    if (elapsedTime >= 1000) {
+  checkAndResume(world, dropTick) {
+    const elapsedTicks = gameLoopTicks - dropTick;
+    if (elapsedTicks >= 166) {
       world.throwableObjects.push(
         new Bomb(this.x + this.width / 4, this.y + this.height / 2, 0, 0, 30, world)
       );
       this.speedX = this.horizontalSpeedDrone;
     } else {
-      requestAnimationFrame(() => (!gamePaused ? this.checkAndResume(world, dropTime) : null));
+      requestAnimationFrame(() => (!this.gamePaused ? this.checkAndResume(world, dropTick) : null));
     }
   }
 
   droneDropBomb(world) {
-    const now = Date.now();
-    if (now - this.lastDropTime >= 5000) {
+    if (gameLoopTicks - this.lastDropTick >= 830) {
       this.dropBomb(world);
-      this.randomDropBombDelay = 5000 + Math.random() * 5000;
-      this.lastDropTime = now;
+      this.randomDropBombDelay = 830 + Math.floor(Math.random() * 830);
+      this.lastDropTick = gameLoopTicks;
     }
   }
 
   initDropBomb(world) {
-    if (Date.now() - this.lastDropTime >= this.randomDropBombDelay) {
+    if (gameLoopTicks - this.lastDropTick >= this.randomDropBombDelay) {
       this.droneDropBomb(world);
     }
   }

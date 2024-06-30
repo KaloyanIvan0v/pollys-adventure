@@ -14,10 +14,23 @@ body {
   gap: 30px;
 }
 
-canvas {
+#fullscreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#canvas {
   background-color: black;
   box-shadow: 0 0 100px 100px rgb(207, 207, 207);
   z-index: 10;
+  max-width: 100%;
+}
+
+.test-button {
+  position: relative;
+  top: -80%;
+  left: -80%;
 }
 
 .headline-img {
@@ -27,6 +40,8 @@ canvas {
   top: 0;
   left: 50;
   z-index: 9;
+  max-width: 100%;
+  z-index: 20;
 }
 
 .dog-background {
@@ -56,5 +71,17 @@ canvas {
 @media (max-height: 1000px) {
   .headline-img {
     width: 500px;
+  }
+}
+
+@media (max-height: 750px) {
+  .headline-img {
+    width: 200px;
+  }
+}
+
+@media (max-height: 630px) {
+  .headline-img {
+    display: none;
   }
 }
