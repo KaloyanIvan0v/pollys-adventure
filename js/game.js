@@ -15,11 +15,18 @@ let fullscreen = false;
 let canvasDimensions = { width: 720, height: 480 };
 let canvasRect = { top: 0, left: 0 };
 let lastScreenOrientation;
+let lastHoveredButton;
 
 function init() {
-  //configUserDevice();
-  updateCanvasData();
+  refreshCanvas();
   loadStartScreen();
+  screenInterval();
+  touchEvents();
+  initClickEventForFullscreen();
+}
+
+function initClickEventForFullscreen() {
+  document.getElementById("id-fullscreen-instruction").addEventListener("click", playInFullscreen);
 }
 
 function toggleFullscreen() {
@@ -46,7 +53,7 @@ function startGame() {
   startScreen.stopLoop();
   loadGame();
   muteSound = false;
-  ScreenOrientationListener();
+  screenOrientationListener();
 }
 
 function reload() {
@@ -87,17 +94,30 @@ function togglePlayPause() {
 }
 
 function enterFullScreen() {
-  if (this.canvas.requestFullscreen) {
-    this.canvas.requestFullscreen();
-    fullscreen = true;
+  if (canvas.requestFullscreen) {
+    canvas.requestFullscreen();
+  } else if (canvas.mozRequestFullScreen) {
+    canvas.mozRequestFullScreen();
+  } else if (canvas.webkitRequestFullscreen) {
+    canvas.webkitRequestFullscreen();
+  } else if (canvas.msRequestFullscreen) {
+    canvas.msRequestFullscreen();
   }
+  fullscreen = true;
 }
 
 function exitFullScreen() {
   if (document.exitFullscreen) {
     document.exitFullscreen();
-    fullscreen = false;
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen();
   }
+  fullscreen = false;
+  gamePaused = true;
 }
 
 window.addEventListener("keydown", (e) => {

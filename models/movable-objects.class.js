@@ -8,6 +8,7 @@ class MovableObject extends DrawableObject {
   collisionDetected;
   alreadyDead = false;
   onGround = true;
+  collectible = false;
 
   constructor() {
     super();

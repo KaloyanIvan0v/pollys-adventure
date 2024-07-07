@@ -17,6 +17,7 @@ class World extends Sound {
   backgroundMusic = new Audio("/audio/mysterious-melody-loop-197040.mp3");
   endScreen = new EndScreen();
   intervalId;
+  collectibleObjects = [this.throwableObjects, this.collidingEnemies];
 
   constructor(canvas, keyboard) {
     super();
@@ -57,7 +58,7 @@ class World extends Sound {
         this.drawEndScreen();
         this.stopAllSounds();
       }
-    }, 1000 / 166);
+    }, 1000 / 60);
   }
 
   stopGameLoop() {

@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Polly's Adventure</title>
   <link rel="icon" type="image/x-icon" href="/img/characters/dog/idle/004-000.png">
   <link rel="stylesheet" href="style.css">
@@ -33,21 +34,34 @@
   <script src="/models/endscreen.class.js"></script>
   <script src="/levels/level1.js"></script>
   <script src="/js/game-helper.js"></script>
+  <script src="/js/screen-instructions.js"></script>
+  <script src="/js/mobile-control.js"></script>
   <script src="/js/game.js"></script>
 
 </head>
 
 <body onload="init()">
   <img class="headline-img" src="/img/background/background-img/Polly`s.png" alt="">
-  <!-- <div id="fullscreen"> -->
-  <canvas id="canvas" width="720" height="480"></canvas>
-  <!-- <button id="id-test-button" onclick="test()" class="test-button">test</button> -->
-  <!-- </div> -->
-
-
+  <canvas id="canvas" width="720" height="480">
+    <div id="testButton" class="button" onclick="playInFullscreen()">
+      <h1>Polly's Adventure</h1>
+    </div>
+  </canvas>
   <img class="dog-background" src="/img/background/background-img/dog.png" alt="">
   <img class="enemy-big-background" src="/img/background/background-img/enemy-big.png" alt="">
   <img class="enemy-small-background" src="/img/background/background-img/enemy-small.png" alt="">
+  <div id="id-shadow-layer" class="shadow-layer v-hidden">
+    <div id="id-rotate-instruction" class="screen-instruction">
+      <img src="/img/background/gameInstructions/rotate-smartphone.png" alt="">
+    </div>
+  </div>
+
+  <div id="id-fullscreen-instruction" class="screen-instruction d-none">
+    <img src="/img/GUI/buttons/fullscreen-single.png" alt="">
+    <p>Click to play in fullscreen</p>
+  </div>
+
+
 </body>
 
 </html>

@@ -26,17 +26,7 @@ class GameMenu {
   rightButton = new Button(0.22, 0.89, 0.08, 0.12, this.RIGHT_BUTTON);
   upButton = new Button(0.75, 0.89, 0.08, 0.12, this.UP_BUTTON);
 
-  allButtons = [
-    this.soundButton,
-    this.playPauseButton,
-    this.reloadButton,
-    this.infoButton,
-    this.settingsButton,
-    this.fullscreenButton,
-    this.leftButton,
-    this.rightButton,
-    this.upButton,
-  ];
+  mobileButtons = [this.leftButton, this.rightButton, this.upButton];
 
   controlButtons = [
     this.soundButton,
@@ -53,12 +43,21 @@ class GameMenu {
 
   animate() {
     this.animateButtons();
-    this.handleCursorPointer(mouse.lastMove);
+    //this.handleCursorPointer(mouse.lastMove);
     this.updateButtonPosition();
   }
 
   returnButtons() {
-    return this.allButtons;
+    let buttons = [this.settingsButton];
+    this.controlButtons.forEach((button) => {
+      buttons.push(button);
+    });
+    if (isMobileDevice()) {
+      this.mobileButtons.forEach((button) => {
+        buttons.push(button);
+      });
+    }
+    return buttons;
   }
 
   animateButtons() {
@@ -73,50 +72,70 @@ class GameMenu {
     this.infoButton.animate(x_move, y_move, x_click, y_click);
     this.reloadButton.animate(x_move, y_move, x_click, y_click, reload);
     this.fullscreenButton.animate(x_move, y_move, x_click, y_click, toggleFullscreen);
+    this.animateMobileButtons();
   }
 
-  handleCursorPointer(position) {
-    let x = position.x;
-    let y = position.y;
-    if (this.anyButtonIsHovered(x, y)) {
-      canvas.style.cursor = "pointer";
-    } else {
-      canvas.style.cursor = "default";
+  animateMobileButtons() {
+    let x_move = mouse.lastMove.x;
+    let y_move = mouse.lastMove.y;
+    let x_click = mouse.lastClick.x;
+    let y_click = mouse.lastClick.y;
+    if (isMobileDevice()) {
+      this.leftButton.animate(x_move, y_move, x_click, y_click, leftButtonClick);
+      this.rightButton.animate(x_move, y_move, x_click, y_click, rightButtonClick);
+      this.upButton.animate(x_move, y_move, x_click, y_click, upButtonClick);
+      this.leftButton.isTouched(leftButtonClick, leftButtonClick);
+      this.rightButton.isTouched(rightButtonClick, rightButtonClick);
+      this.upButton.isTouched(upButtonClick, upButtonClick);
+      this.animateMenuMobileButtons();
     }
   }
 
-  anyButtonIsHovered(x, y) {
-    let anyButtonIsHovered = false;
-    this.allButtons.forEach((button) => {
-      if (button.isHovered(x, y)) {
-        anyButtonIsHovered = true;
-      }
-    });
-    return anyButtonIsHovered;
+  animateMenuMobileButtons() {
+    this.settingsButton.isTouched(toggleGameMenu);
+    this.soundButton.isTouched(toggleSound);
+    this.playPauseButton.isTouched(togglePlayPause);
+    this.infoButton.isTouched();
+    this.reloadButton.isTouched(reload);
+    this.fullscreenButton.isTouched(toggleFullscreen);
   }
 
   updateButtonPosition() {
     if (gameMenu) {
-      this.controlButtons.forEach((button) => {
-        button.x = 0.91 * canvas.width;
-        button.x_click = 0.91 * canvasDimensions.width;
-      });
+      this.gameMenuShowButtons();
     } else {
-      this.controlButtons.forEach((button) => {
-        button.x = 1.5 * canvas.width;
-        button.x_click = 1.5 * canvasDimensions.width;
-      });
+      this.gameMenuHideButtons();
     }
-    //return this.x;
+  }
+
+  gameMenuShowButtons() {
+    this.controlButtons.forEach((button) => {
+      button.x = 0.91 * canvas.width;
+      button.x_click = 0.91 * canvasDimensions.width;
+    });
+  }
+
+  gameMenuHideButtons() {
+    this.controlButtons.forEach((button) => {
+      button.x = 1.5 * canvas.width;
+      button.x_click = 1.5 * canvasDimensions.width;
+    });
   }
 
   updateButtonImg() {
+    this.updateImgForSoundButton();
+    this.updateButtonImgForPlayPauseButton();
+  }
+
+  updateImgForSoundButton() {
     if (muteSound) {
       this.soundButton.img = this.soundButton.imgCache[this.soundButton.images[1]];
     } else {
       this.soundButton.img = this.soundButton.imgCache[this.soundButton.images[0]];
     }
+  }
 
+  updateButtonImgForPlayPauseButton() {
     if (gamePaused) {
       this.playPauseButton.img = this.playPauseButton.imgCache[this.playPauseButton.images[1]];
     } else {

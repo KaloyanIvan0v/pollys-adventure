@@ -57,5 +57,6 @@ class StartScreen extends MovableObject {
       mouse.lastClick.y,
       toggleSound
     );
+    this.playButton.isTouched(startGame);
   }
 }

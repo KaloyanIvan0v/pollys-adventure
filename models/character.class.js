@@ -39,7 +39,7 @@ class Character extends MovableObject {
   constructor() {
     super().loadImg("/img/characters/dog/idle/004-000.png");
     this.y = 280;
-    this.speedX = 0.14;
+    this.speedX = 0.34;
     this.playSound(this.greetingSound);
     this.loadImages(this.IMAGES_IDLE);
     this.loadImages(this.IMAGES_WALKING);
@@ -57,22 +57,22 @@ class Character extends MovableObject {
     this.alreadyDead = false;
     this.energy = 100;
     this.speedY = 0;
-    this.speedX = 0.14;
+    this.speedX = 0.34;
     this.flipImg = false;
     this.x = 100;
     this.y = 280;
   }
 
   handleCharacterMovement() {
-    if (this.world.keyboard.LEFT && this.x > -500) {
+    if ((this.world.keyboard.LEFT || moveLeft) && this.x > -500) {
       this.characterMoveLeft();
-    } else if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
+    } else if ((this.world.keyboard.RIGHT || moveRight) && this.x < this.world.level.level_end_x) {
       this.characterMoveRight();
     } else {
       this.stopSound(this.walking_sound);
       this.playSound(this.idle_sound, 0.5, soundVolumeGame);
     }
-    if (this.world.keyboard.SPACE && !this.isAboveGround()) {
+    if ((this.world.keyboard.SPACE || moveUp) && !this.isAboveGround()) {
       this.characterJumps();
     }
   }
@@ -132,7 +132,9 @@ class Character extends MovableObject {
   }
 
   characterMovesLeftOrRight() {
-    return this.world.keyboard.RIGHT || this.world.keyboard.LEFT ? true : false;
+    return this.world.keyboard.RIGHT || this.world.keyboard.LEFT || moveRight || moveLeft
+      ? true
+      : false;
   }
 
   characterIsColliding() {
@@ -184,4 +186,6 @@ class Character extends MovableObject {
       this.canTakeDamage = true;
     }, time);
   }
+
+  collect() {}
 }

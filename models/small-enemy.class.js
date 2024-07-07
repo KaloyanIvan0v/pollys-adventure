@@ -28,7 +28,7 @@ class SmallEnemy extends MovableObject {
     this.width = 60;
     this.y = 372;
     this.harmful = true;
-    this.speedX = 0.15;
+    this.speedX = 0.45;
   }
 
   animate(targetObj) {

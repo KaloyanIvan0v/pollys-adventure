@@ -12,7 +12,7 @@ class Drone extends MovableObject {
   width = 55;
   lastDropTime = 0;
   randomDropBombDelay = 1000;
-  horizontalSpeedDrone = 0.48;
+  horizontalSpeedDrone = 0.68;
   drone_fly = new Audio("/audio/enemy/drone/1.mp3");
   lastDropTick = 0;
 

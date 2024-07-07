@@ -1,7 +1,7 @@
 function hasVerticalBlackBars() {
   const windowAspectRatio = window.innerWidth / window.innerHeight;
   const desiredAspectRatio = 3 / 2;
-  return windowAspectRatio < desiredAspectRatio;
+  return windowAspectRatio > desiredAspectRatio;
 }
 
 function getCanvasPositionForFullscreen() {
@@ -59,7 +59,7 @@ function calculateCanvasDimensions() {
   }
 }
 
-function updateCanvasData() {
+function refreshCanvas() {
   setInterval(() => {
     calculateCanvasPosition();
     calculateCanvasDimensions();
@@ -96,6 +96,6 @@ function updateScreenOrientation() {
   }
 }
 
-function ScreenOrientationListener() {
+function screenOrientationListener() {
   window.addEventListener("orientationchange", world.buttonResizeUpdate);
 }

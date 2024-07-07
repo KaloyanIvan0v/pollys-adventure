@@ -17,7 +17,7 @@ class Mouse {
     });
   }
 
-  updateMouseMove(event, element) {
+  updateMouseMove(event) {
     const rect = canvasRect;
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;
@@ -25,18 +25,7 @@ class Mouse {
     this.lastMove.y = y;
   }
 
-  returnCanvasRectTopLeft(element) {
-    if (!fullscreen) {
-      const rect = element.getBoundingClientRect();
-      return rect;
-    } else {
-      let rect = { left: 0, top: 0 };
-
-      return rect;
-    }
-  }
-
-  updateMouseClick(event, element) {
+  updateMouseClick(event) {
     const rect = canvasRect;
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;

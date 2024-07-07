@@ -10,9 +10,12 @@ class Button extends DrawableObject {
   images = [];
   img;
   lastHoverState = false;
+  buttonHovered = false;
   clickSound = new Audio("/audio/objects/button/button-click.mp3");
   x_multiplier = 1;
   y_multiplier = 1;
+  buttonHovered = false;
+  pressed = false;
 
   constructor(x, y, width, height, images) {
     super();
@@ -40,10 +43,12 @@ class Button extends DrawableObject {
       }
     }
     this.isClicked(x_click, y_click, functionToCall);
+    this.handleCursor();
   }
 
   buttonIsHovered() {
     this.lastHoverState = true;
+    this.buttonHovered = true;
     this.hoveredAnimation();
     this.playSound(this.clickSound, 0.2, soundVolumeGUI);
   }
@@ -51,6 +56,7 @@ class Button extends DrawableObject {
   buttonIsNotHovered() {
     this.idleAnimation();
     this.lastHoverState = false;
+    this.buttonHovered = false;
   }
 
   isClicked(x, y, functionToCall) {
@@ -58,6 +64,9 @@ class Button extends DrawableObject {
       mouse.clickEnabled = false;
       functionToCall();
       this.toggleButtonImg();
+      setTimeout(() => {
+        canvas.style.cursor = "default";
+      }, 20);
     }
   }
 
@@ -93,15 +102,45 @@ class Button extends DrawableObject {
     this.width = this.width - 4;
   }
 
-  updateCursorPointer(position) {
-    let x = position.x;
-    let y = position.y;
-    if (this.isHovered(x, y)) {
+  handleCursor() {
+    if (this.isHovered(mouse.lastMove.x, mouse.lastMove.y)) {
+      lastHoveredButton = this;
       canvas.style.cursor = "pointer";
     } else {
-      canvas.style.cursor = "default";
+      if (lastHoveredButton == this || lastHoveredButton == null) {
+        canvas.style.cursor = "default";
+        lastHoveredButton = null;
+      }
     }
   }
 
-  pressed() {}
+  isTouched(startFunction, endFunction) {
+    let anyTouchHovered = false;
+
+    activeTouchPoints.forEach((touch) => {
+      if (this.isHovered(touch.x, touch.y)) {
+        anyTouchHovered = true;
+        if (!this.pressed) {
+          this.pressed = true;
+          startFunction(this.pressed);
+        }
+      }
+    });
+
+    if (!anyTouchHovered) {
+      if (this.pressed) {
+        this.pressed = false;
+        if (endFunction) {
+          endFunction(this.pressed);
+        }
+      }
+    }
+
+    if (activeTouchPoints.size == 0) {
+      this.pressed = false;
+      if (endFunction) {
+        endFunction(this.pressed);
+      }
+    }
+  }
 }
