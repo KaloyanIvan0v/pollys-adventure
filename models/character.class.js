@@ -32,13 +32,17 @@ class Character extends MovableObject {
   jump_sound = new Audio("/audio/dog-jump.mp3");
   idle_sound = new Audio("/audio/dog-breath.mp3");
   greetingSound = new Audio("/audio/dog/dog-start-game-sound.wav");
+  pickup_sound = new Audio("/audio/dog/pick.wav");
   walking;
   alreadyWalking = false;
   canTakeDamage = true;
+  cardAmount = 0;
+  cardPercent = 0;
 
   constructor() {
     super().loadImg("/img/characters/dog/idle/004-000.png");
     this.y = 280;
+    this.x = -440;
     this.speedX = 0.34;
     this.playSound(this.greetingSound);
     this.loadImages(this.IMAGES_IDLE);
@@ -50,7 +54,7 @@ class Character extends MovableObject {
   animate() {
     this.handleCharacterAnimation();
     this.handleCharacterMovement();
-    this.setPlayerViewPoint(115);
+    this.setPlayerViewPoint(145);
   }
 
   resetCharacter() {
@@ -59,7 +63,7 @@ class Character extends MovableObject {
     this.speedY = 0;
     this.speedX = 0.34;
     this.flipImg = false;
-    this.x = 100;
+    this.x = -440;
     this.y = 280;
   }
 
@@ -141,12 +145,12 @@ class Character extends MovableObject {
     return this.currentCollisionState;
   }
 
-  CheckCollisionsWith() {
+  checkCollisionsWith() {
     this.collisionDetected = false;
     this.world.level.enemies.forEach((enemy) => {
       if (this.isColliding(enemy)) {
         this.isItJumpOnEnemy(enemy);
-        this.world.statusBar.setPercentage(this.energy);
+        this.world.statusBarHealth.setPercentage(this.energy);
         if (!this.isAboveGround()) {
           this.hurt(enemy.harmful);
         }
@@ -187,5 +191,46 @@ class Character extends MovableObject {
     }, time);
   }
 
-  collect() {}
+  checkForCollectibleItems(throwableObjects) {
+    if (throwableObjects.length > 0) {
+      throwableObjects.forEach((obj) => {
+        if (this.isColliding(obj)) {
+          if (obj.collectable) {
+            throwableObjects.splice(throwableObjects.indexOf(obj), 1);
+            obj instanceof Bomb ? null : this.handlePickupItem();
+          }
+        }
+      });
+    }
+  }
+
+  handlePickupItem() {
+    this.animateCollectToBar();
+    this.increaseCardAmount();
+    this.playSound(this.pickup_sound);
+  }
+
+  increaseCardAmount() {
+    if (this.cardAmount < 6) {
+      this.cardAmount++;
+    }
+  }
+  calculateCardsPercentage() {
+    if (this.cardAmount > 0) {
+      this.cardPercent = (this.cardAmount / 6) * 100;
+    } else {
+      this.cardPercent = 0;
+    }
+  }
+
+  animateCollectToBar() {
+    let collectAnimation = new CollectAnimation(
+      this.x,
+      this.y,
+      20,
+      30,
+      "/img/objects/card/003-000.png"
+    );
+    collectAnimation.animate();
+  }
 }

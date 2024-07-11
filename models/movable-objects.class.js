@@ -8,7 +8,7 @@ class MovableObject extends DrawableObject {
   collisionDetected;
   alreadyDead = false;
   onGround = true;
-  collectible = false;
+  collectable = false;
 
   constructor() {
     super();
@@ -49,6 +49,9 @@ class MovableObject extends DrawableObject {
       this.img = img;
       this.currentImg++;
       this.lastFrameTime = now;
+      this.currentImg <= images.length - 1
+        ? (this.animationRunOnce = false)
+        : (this.animationRunOnce = true);
     }
   }
 

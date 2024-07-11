@@ -1,6 +1,11 @@
 class Level {
   enemies = [];
   drones = [];
+  decorations = [
+    new DecorationObject(-830, 280, 300, 150, "/img/objects/cars/yellow-car.png"),
+    new DecorationObject(-560, 350, 60, 80, "/img/objects/water-hydrant/001-003.png"),
+    new FireAnimation(-590, 220, 50, 150),
+  ];
   backgroundObjects1 = [];
   backgroundObjects2 = [];
   backgroundObjects3 = [];
@@ -21,9 +26,11 @@ class Level {
       this.enemies = enemies;
     }
     for (let i = 0; i < dronesAmount; i++) {
-      drones.push(new Drone());
+      drones.push(new Drone(2500));
       this.drones = drones;
     }
+    let endBoss = new EndBoss();
+    //this.enemies.push(endBoss);
   }
 
   constructBackground() {

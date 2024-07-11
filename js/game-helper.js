@@ -1,3 +1,7 @@
+let canvasDimensions = { width: 720, height: 480 };
+let canvasRect = { top: 0, left: 0 };
+let lastScreenOrientation;
+
 function hasVerticalBlackBars() {
   const windowAspectRatio = window.innerWidth / window.innerHeight;
   const desiredAspectRatio = 3 / 2;

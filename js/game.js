@@ -12,9 +12,6 @@ let activeSounds = [];
 let gameMenu = false;
 let gameLoopTicks = 0;
 let fullscreen = false;
-let canvasDimensions = { width: 720, height: 480 };
-let canvasRect = { top: 0, left: 0 };
-let lastScreenOrientation;
 let lastHoveredButton;
 
 function init() {

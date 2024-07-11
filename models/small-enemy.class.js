@@ -18,7 +18,7 @@ class SmallEnemy extends MovableObject {
   deadSound = new Audio("/audio/enemy/small/dead.mp3");
   movingSound = new Audio("/audio/enemy/small/walk.mp3");
 
-  constructor() {
+  constructor(x, y, speedX, speedY, fallSpeed) {
     super().loadImg("/img/characters/enemy/small/walk/1.png");
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_DEAD);
@@ -29,9 +29,19 @@ class SmallEnemy extends MovableObject {
     this.y = 372;
     this.harmful = true;
     this.speedX = 0.45;
+    x ? this.setSpawnPosition(x, y, speedX, speedY, fallSpeed) : null;
+  }
+
+  setSpawnPosition(x, y, speedX, speedY, fallSpeed) {
+    this.x = x;
+    this.y = y;
+    this.speedX = speedX;
+    this.speedY = speedY;
+    this.fallSpeed = fallSpeed;
   }
 
   animate(targetObj) {
+    this.applyGravity(10);
     this.handleObjMovement();
     this.handleObjAnimation();
     this.adjustSoundVolumeByDistance(targetObj, this);
@@ -61,7 +71,9 @@ class SmallEnemy extends MovableObject {
     this.playSound(this.deadSound, 1, soundVolumeGame);
     this.energy = 0;
     this.speedX = 0;
-    this.collectable = true;
+    setTimeout(() => {
+      this.collectable = true;
+    }, 500);
     this.harmful = false;
   }
 }

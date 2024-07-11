@@ -15,12 +15,13 @@ class Drone extends MovableObject {
   horizontalSpeedDrone = 0.68;
   drone_fly = new Audio("/audio/enemy/drone/1.mp3");
   lastDropTick = 0;
+  characterUnderDrone = false;
 
-  constructor() {
+  constructor(x) {
     super().loadImg("/img/characters/drone/idle/004-000.png");
     this.loadImages(this.IMG_WALKING);
     this.loadImages(this.IMG_IDLE);
-    this.x = 800;
+    this.x = x;
     this.y = 60;
     this.drone_fly.loop = true;
     this.speedX = this.horizontalSpeedDrone;
@@ -64,7 +65,7 @@ class Drone extends MovableObject {
   }
 
   droneDropBomb(world) {
-    if (gameLoopTicks - this.lastDropTick >= 830) {
+    if (gameLoopTicks - this.lastDropTick >= 830 || this.characterUnderDrone) {
       this.dropBomb(world);
       this.randomDropBombDelay = 830 + Math.floor(Math.random() * 830);
       this.lastDropTick = gameLoopTicks;
@@ -72,8 +73,21 @@ class Drone extends MovableObject {
   }
 
   initDropBomb(world) {
-    if (gameLoopTicks - this.lastDropTick >= this.randomDropBombDelay) {
+    if (gameLoopTicks - this.lastDropTick >= this.randomDropBombDelay || this.characterUnderDrone) {
       this.droneDropBomb(world);
+    }
+  }
+
+  checkIfCharacterIsUnderDrone(character) {
+    let characterX = Math.floor(character.x + character.width / 2);
+    let droneX = Math.floor(this.x + this.width / 2);
+    if (characterX === droneX) {
+      this.characterUnderDrone = true;
+      setTimeout(() => {
+        this.characterUnderDrone = false;
+      }, 20);
+    } else {
+      this.characterUnderDrone = false;
     }
   }
 }

@@ -3,6 +3,7 @@ class DrawableObject extends Sound {
   imgCache = {};
   currentImg = 0;
   playedAnimationOnce = false;
+  animationRunOnce = false;
   startRenderImgAmount = 0;
   x = 100;
   y = 358;

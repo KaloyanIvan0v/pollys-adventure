@@ -47,20 +47,29 @@ class Bomb extends ThrowableObject {
 
   ifBombHitGround() {
     if (!this.isAboveGround() && !this.ifBombFallOnSlime() && this.harmful) {
-      this.playSound(this.bomb_explosion, 0.3, soundVolumeGame);
-      this.y = 400;
-      this.energy = 0;
-      setTimeout(() => {
-        this.harmful = false;
-      }, 400);
+      this.bombExplode();
     } else {
-      if (this.ifBombFallOnSlime()) {
-        if (this.harmful) {
-          this.y = 430 - this.height;
-          this.playSound(this.bomb_hit_slime, 1, soundVolumeGame);
-        }
-        this.harmful = false;
+      this.bombDoNotExplode();
+    }
+  }
+
+  bombExplode() {
+    this.playSound(this.bomb_explosion, 0.3, soundVolumeGame);
+    this.y = 400;
+    this.energy = 0;
+    setTimeout(() => {
+      this.harmful = false;
+    }, 400);
+  }
+
+  bombDoNotExplode() {
+    if (this.ifBombFallOnSlime()) {
+      if (this.harmful) {
+        this.y = 430 - this.height;
+        this.playSound(this.bomb_hit_slime, 1, soundVolumeGame);
       }
+      this.harmful = false;
+      this.collectable = true;
     }
   }
 
@@ -68,7 +77,7 @@ class Bomb extends ThrowableObject {
     let bombOnSlime = false;
     this.world.level.enemies.forEach((enemy) => {
       if (this.isColliding(enemy)) {
-        if (this.x > enemy.x && this.x + this.width < enemy.x + enemy.width) {
+        if (this.x > enemy.x - 10 && this.x + this.width < enemy.x + enemy.width + 10) {
           enemy.alreadyDead ? (bombOnSlime = true) : (bombOnSlime = false);
         }
       }
