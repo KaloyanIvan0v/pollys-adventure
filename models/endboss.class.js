@@ -20,16 +20,13 @@ class EndBoss extends MovableObject {
     this.height = 350;
     this.width = 350;
     this.harmful = true;
-    //this.animate();
   }
-  animate() {
-    setInterval(() => {
-      if (!gamePaused && world != undefined) {
-        this.playAnimation(this.IMG_WALKING, 300);
-        this.moveLeft(1);
-        this.spawnEveryTwoSecond();
-      }
-    }, 1000 / 60);
+  objLoop() {
+    if (!gamePaused && world != undefined && world.character.x > 1500) {
+      this.playAnimation(this.IMG_WALKING, 300);
+      this.moveLeft(1);
+      this.spawnEveryTwoSecond();
+    }
   }
 
   generateSmallEnemies() {

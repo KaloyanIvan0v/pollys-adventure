@@ -26,7 +26,7 @@ class Level {
       this.enemies = enemies;
     }
     for (let i = 0; i < dronesAmount; i++) {
-      drones.push(new Drone(2500));
+      drones.push(new Drone(9500));
       this.drones = drones;
     }
     let endBoss = new EndBoss();

@@ -32,19 +32,19 @@ class SmallEnemy extends MovableObject {
     x ? this.setSpawnPosition(x, y, speedX, speedY, fallSpeed) : null;
   }
 
+  objLoop() {
+    this.applyGravity(10);
+    this.handleObjMovement();
+    this.handleObjAnimation();
+    this.adjustSoundVolumeByDistance(world.character, this);
+  }
+
   setSpawnPosition(x, y, speedX, speedY, fallSpeed) {
     this.x = x;
     this.y = y;
     this.speedX = speedX;
     this.speedY = speedY;
     this.fallSpeed = fallSpeed;
-  }
-
-  animate(targetObj) {
-    this.applyGravity(10);
-    this.handleObjMovement();
-    this.handleObjAnimation();
-    this.adjustSoundVolumeByDistance(targetObj, this);
   }
 
   handleObjMovement() {

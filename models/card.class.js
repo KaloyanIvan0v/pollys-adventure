@@ -1,6 +1,7 @@
 class Card extends ThrowableObject {
   hitObject = false;
   EXPLODE_ANIMATION = [];
+
   explodeSound = new Audio("/audio/objects/card-cannon/blub.mp3");
   loadExplodeImages() {
     for (let i = 53; i >= 0; i--) {
@@ -17,20 +18,17 @@ class Card extends ThrowableObject {
     this.loadImg("/img/objects/card/003-000.png");
     this.width = 25;
     this.height = 25;
-    setInterval(() => {
-      if (!gamePaused) {
-        this.animate();
-      }
-    });
   }
 
-  animate() {
+  objLoop() {
     if (this.hitObject) {
-      if (!this.animationRunOnce) {
+      if (this.animationStillRunning()) {
         this.explodeAnimation();
-        this.playSound(this.explodeSound);
+        this.playLastSound(this.explodeSound);
+        setTimeout(() => {
+          this.alreadyDead = true;
+        }, 70);
       } else {
-        this.alreadyDead = true;
       }
     }
   }
@@ -46,6 +44,6 @@ class Card extends ThrowableObject {
   }
 
   explodeAnimation() {
-    this.playAnimation(this.EXPLODE_ANIMATION, 0.08);
+    this.playAnimation(this.EXPLODE_ANIMATION, 0.001);
   }
 }

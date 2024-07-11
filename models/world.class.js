@@ -15,8 +15,8 @@ class World extends Sound {
   endScreen = new EndScreen();
   backgroundMusic = new Audio("/audio/mysterious-melody-loop-197040.mp3");
   throwCard = new Audio("/audio/objects/throw-card.mp3");
-  animations = [];
 
+  animations = [];
   throwableObjects = [];
   backgroundObjects = level1.backgroundObjects;
   alreadyThrown = false;
@@ -34,27 +34,12 @@ class World extends Sound {
     this.resizeListener();
   }
 
-  resizeListener() {
-    window.addEventListener("resize", () => {
-      this.buttonResizeUpdate();
-      console.log("resize");
-    });
-  }
-
-  buttonResizeUpdate() {
-    setTimeout(() => {
-      this.gameMenu = new GameMenu(0, 0);
-      this.endScreen = new EndScreen();
-    }, 200);
-  }
-
   gameLoop() {
     this.intervalId = setInterval(() => {
       if (!holdWorld) {
         if (!gamePaused) {
           this.animateObjects();
           this.worldEvents();
-          this.runAnimations();
           gameLoopTicks = gameLoopTicks + 1;
         }
         this.draw();
@@ -66,31 +51,16 @@ class World extends Sound {
     }, 1000 / 60);
   }
 
-  stopGameLoop() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
-  }
-
-  runAnimations() {
-    this.animations.forEach((animation) => {
-      animation.animate();
-    });
-  }
-
   animateObjects() {
+    this.runAnimations();
     this.animateDrones();
     this.animateEnemies();
-    this.character.animate();
-    this.cardCannon.animate(this.character, this.throwableObjects);
+    this.character.objLoop();
+    this.cardCannon.objLoop(this.character, this.throwableObjects);
+    this.throwableObjectsLoop();
   }
 
   worldEvents() {
-    this.character.checkCollisionsWith();
-    this.character.calculateCardsPercentage();
-    this.character.areaDamage(this.throwableObjects);
-    this.character.checkForCollectibleItems(this.throwableObjects);
     this.level.drones[0].initDropBomb(this);
     this.level.drones[0].checkIfCharacterIsUnderDrone(this.character);
     this.checkIfTisUp();
@@ -108,6 +78,94 @@ class World extends Sound {
       ? this.character.playSound(this.backgroundMusic, 0.03, soundVolumeGUI)
       : this.character.playSound(this.backgroundMusic, 0.06, soundVolumeGUI);
     this.gameMenu.animate();
+  }
+
+  throwableObjectsLoop() {
+    this.throwableObjects.forEach((throwableObject) => {
+      throwableObject.objLoop();
+    });
+  }
+
+  runAnimations() {
+    this.animations.forEach((animation) => {
+      animation.objLoop();
+      animation.endPositionReached
+        ? this.animations.splice(this.animations.indexOf(animation), 1)
+        : null;
+    });
+  }
+
+  animateDrones() {
+    this.level.drones.forEach((drone) => {
+      drone.objLoop();
+    });
+  }
+
+  animateDecorations() {
+    this.level.decorations.forEach((element) => {
+      element.objLoop();
+    });
+  }
+
+  draw() {
+    this.drawDynamicObjects();
+    this.drawFixedObjects();
+  }
+
+  animateEnemies() {
+    this.level.enemies.forEach((enemy) => {
+      enemy.objLoop();
+    });
+  }
+
+  drawDynamicObjects() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawParallaxBackgroundLayers();
+    this.ctx.translate(this.camera_x, 0);
+    this.addToMap(this.cardCannon);
+    this.addDecorationsToMap();
+    this.drawAnimations();
+    this.addObjToMap(this.level.drones);
+    this.addObjToMap(this.level.enemies);
+    this.addObjToMap(this.throwableObjects);
+    this.addToMap(this.character);
+    this.ctx.translate(-this.camera_x, 0);
+  }
+
+  drawFixedObjects() {
+    this.addToMap(this.statusBarHealth);
+    this.addToMap(this.statusBarCards);
+    this.addToMap(this.statusBarCardsImg);
+    this.gameMenu.returnButtons().forEach((button) => {
+      this.addToMap(button);
+    });
+  }
+
+  drawParallaxBackgroundLayers() {
+    this.drawObjectWithCameraOffset(this.level.backgroundObjects1, 1);
+    this.drawObjectWithCameraOffset(this.level.backgroundObjects2, 0.4);
+    this.drawObjectWithCameraOffset(this.level.backgroundObjects3, 0.6);
+    this.drawObjectWithCameraOffset(this.level.backgroundObjects4, 0.8);
+    this.drawObjectWithCameraOffset(this.level.backgroundObjects5, 1);
+  }
+
+  drawObjectWithCameraOffset(obj, position_x_Offset) {
+    this.ctx.translate(this.camera_x * position_x_Offset, 0);
+    this.addObjToMap(obj);
+    this.ctx.translate(-this.camera_x * position_x_Offset, 0);
+  }
+
+  drawAnimations() {
+    this.animations.forEach((animation) => {
+      this.addToMap(animation);
+    });
+  }
+
+  stopGameLoop() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
   }
 
   restartGame() {
@@ -132,20 +190,6 @@ class World extends Sound {
     this.statusBarCards.setPercentage(this.character.cardPercent);
   }
 
-  animateEnemies() {
-    this.level.enemies.forEach((enemy) => {
-      if (enemy instanceof SmallEnemy) {
-        enemy.animate(this.character);
-      }
-    });
-  }
-
-  animateDrones() {
-    this.level.drones.forEach((drone) => {
-      drone.animate(this.character);
-    });
-  }
-
   removeExplodedThrownObjects() {
     this.removeObject(this.throwableObjects);
   }
@@ -158,17 +202,30 @@ class World extends Sound {
     });
   }
 
+  resizeListener() {
+    window.addEventListener("resize", () => {
+      this.buttonResizeUpdate();
+    });
+  }
+
+  buttonResizeUpdate() {
+    setTimeout(() => {
+      this.gameMenu = new GameMenu(0, 0);
+      this.endScreen = new EndScreen();
+    }, 200);
+  }
+
   checkThrowableObjects() {
     if (this.keyboard.T && !this.alreadyThrown && this.character.cardAmount > 0) {
       let card = new Card(this.character.x, this.character.y, 13, 15, 40);
       card.harmful = true;
       this.playSound(this.throwCard);
       this.throwableObjects.push(card);
+      this.alreadyThrown = true;
+      this.character.cardAmount--;
       setTimeout(() => {
         card.collectable = true;
       }, 200);
-      this.alreadyThrown = true;
-      this.character.cardAmount--;
     }
   }
 
@@ -182,11 +239,6 @@ class World extends Sound {
     this.character.world = this;
   }
 
-  draw() {
-    this.drawDynamicObjects();
-    this.drawFixedObjects();
-  }
-
   drawEndScreen() {
     this.endScreen.draw(this.ctx);
     this.endScreen.animate();
@@ -196,48 +248,6 @@ class World extends Sound {
     this.level.decorations.forEach((element) => {
       this.addToMap(element);
     });
-  }
-
-  animateDecorations() {
-    this.level.decorations.forEach((element) => {
-      element.animate();
-    });
-  }
-
-  drawParallaxBackgroundLayers() {
-    this.drawObjectWithCameraOffset(this.level.backgroundObjects1, 1);
-    this.drawObjectWithCameraOffset(this.level.backgroundObjects2, 0.4);
-    this.drawObjectWithCameraOffset(this.level.backgroundObjects3, 0.6);
-    this.drawObjectWithCameraOffset(this.level.backgroundObjects4, 0.8);
-    this.drawObjectWithCameraOffset(this.level.backgroundObjects5, 1);
-  }
-
-  drawDynamicObjects() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawParallaxBackgroundLayers();
-    this.ctx.translate(this.camera_x, 0);
-    this.addToMap(this.cardCannon);
-    this.addDecorationsToMap();
-    this.addObjToMap(this.level.drones);
-    this.addObjToMap(this.level.enemies);
-    this.addObjToMap(this.throwableObjects);
-    this.addToMap(this.character);
-    this.ctx.translate(-this.camera_x, 0);
-  }
-
-  drawFixedObjects() {
-    this.addToMap(this.statusBarHealth);
-    this.addToMap(this.statusBarCards);
-    this.addToMap(this.statusBarCardsImg);
-    this.gameMenu.returnButtons().forEach((button) => {
-      this.addToMap(button);
-    });
-  }
-
-  drawObjectWithCameraOffset(obj, position_x_Offset) {
-    this.ctx.translate(this.camera_x * position_x_Offset, 0);
-    this.addObjToMap(obj);
-    this.ctx.translate(-this.camera_x * position_x_Offset, 0);
   }
 
   addObjToMap(objects, speedMultiplier) {

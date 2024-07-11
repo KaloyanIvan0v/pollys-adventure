@@ -28,6 +28,9 @@ class Character extends MovableObject {
     "/img/characters/dog/walk/005-006.png",
   ];
 
+  height = 72;
+  width = 72;
+
   walking_sound = new Audio("/audio/dog-runs.mp3");
   jump_sound = new Audio("/audio/dog-jump.mp3");
   idle_sound = new Audio("/audio/dog-breath.mp3");
@@ -51,10 +54,14 @@ class Character extends MovableObject {
     this.applyGravity(40);
   }
 
-  animate() {
+  objLoop() {
+    this.setPlayerViewPoint(145);
     this.handleCharacterAnimation();
     this.handleCharacterMovement();
-    this.setPlayerViewPoint(145);
+    this.checkCollisionsWith();
+    this.calculateCardsPercentage();
+    this.areaDamage(world.throwableObjects);
+    this.checkForCollectibleItems(world.throwableObjects);
   }
 
   resetCharacter() {
@@ -117,6 +124,7 @@ class Character extends MovableObject {
       }
     }
   }
+
   setPlayerViewPoint(position_x) {
     this.world.camera_x = -this.x + position_x;
   }
@@ -231,6 +239,5 @@ class Character extends MovableObject {
       30,
       "/img/objects/card/003-000.png"
     );
-    collectAnimation.animate();
   }
 }

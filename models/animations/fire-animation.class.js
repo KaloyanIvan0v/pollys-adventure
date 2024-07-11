@@ -20,10 +20,10 @@ class FireAnimation extends MovableObject {
     this.loadImages(this.FIRE_IMAGES);
   }
 
-  animate() {
+  objLoop() {
     if (!gamePaused && world != undefined) {
       this.playAnimation(this.FIRE_IMAGES, 0.58);
-      this.playSound(this.fireSound, 0.1);
+      this.playSound(this.fireSound, 0.1, soundVolumeGame);
       this.adjustSoundVolumeByDistance(world.character, this);
     } else {
       this.stopSound(this.fireSound);

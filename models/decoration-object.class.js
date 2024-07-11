@@ -11,5 +11,5 @@ class DecorationObject extends MovableObject {
     this.loadImg(this.OBJECT_IMG);
   }
 
-  animate() {}
+  objLoop() {}
 }

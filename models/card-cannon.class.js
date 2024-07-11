@@ -54,9 +54,8 @@ class CardCannon extends MovableObject {
     this.loadImages(this.CARD_CANNON_ATTACK);
   }
 
-  animate(character, throwableObjectsArray) {
+  objLoop(character, throwableObjectsArray) {
     const distance = this.calculateDistance(this, character);
-
     if (distance < 250) {
       this.handleAttackState();
       this.throwEveryXSeconds(throwableObjectsArray);
@@ -138,10 +137,8 @@ class CardCannon extends MovableObject {
   }
 
   throwEveryXSeconds(list) {
-    console.log("Throw every 3 seconds");
     let currentTime = new Date().getTime();
     if (currentTime - this.lastThrowTime >= 3000) {
-      console.log("Throw card");
       this.throwCard(list);
       this.lastThrowTime = currentTime;
     }

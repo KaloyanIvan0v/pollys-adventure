@@ -5,16 +5,16 @@ class Drone extends MovableObject {
     "/img/characters/drone/walk/005-002.png",
     "/img/characters/drone/walk/005-003.png",
   ];
-
   IMG_IDLE = ["/img/characters/drone/idle/004-000.png", "/img/characters/drone/idle/004-001.png"];
+
+  drone_fly = new Audio("/audio/enemy/drone/1.mp3");
 
   height = 55;
   width = 55;
+  lastDropTick = 0;
   lastDropTime = 0;
   randomDropBombDelay = 1000;
   horizontalSpeedDrone = 0.68;
-  drone_fly = new Audio("/audio/enemy/drone/1.mp3");
-  lastDropTick = 0;
   characterUnderDrone = false;
 
   constructor(x) {
@@ -27,10 +27,10 @@ class Drone extends MovableObject {
     this.speedX = this.horizontalSpeedDrone;
   }
 
-  animate(targetObj) {
+  objLoop() {
     this.handleObjMovement();
     this.handleObjAnimation();
-    this.adjustSoundVolumeByDistance(targetObj, this);
+    this.adjustSoundVolumeByDistance(world.character, this);
   }
 
   handleObjAnimation() {

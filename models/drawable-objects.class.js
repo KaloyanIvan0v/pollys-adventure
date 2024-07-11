@@ -5,13 +5,10 @@ class DrawableObject extends Sound {
   playedAnimationOnce = false;
   animationRunOnce = false;
   startRenderImgAmount = 0;
-  x = 100;
-  y = 358;
-  height = 72;
-  width = 72;
   lastFrameTime = Date.now();
   harmful = false;
   collectable = false;
+  lastSoundPlayedOnce = false;
 
   constructor() {
     super();
@@ -44,6 +41,12 @@ class DrawableObject extends Sound {
     }
   }
 
+  generateImgPathArray(array, arrayLength, imgPath) {
+    for (let i = arrayLength; i >= 0; i--) {
+      i < 10 ? array.push(imgPath + `/00${i}.png`) : array.push(imgPath + `/0${i}.png`);
+    }
+  }
+
   flipImgHorizontally(ctx) {
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
@@ -70,5 +73,16 @@ class DrawableObject extends Sound {
 
   calculateDistance(obj, targetObj) {
     return Math.sqrt(Math.pow(obj.x - targetObj.x, 2) + Math.pow(obj.y - targetObj.y, 2));
+  }
+
+  animationStillRunning() {
+    return !this.animationRunOnce;
+  }
+
+  playLastSound(sound, objVolume, soundVolume) {
+    if (!this.lastSoundPlayedOnce) {
+      this.playSound(sound, objVolume, soundVolume);
+      this.lastSoundPlayedOnce = true;
+    }
   }
 }
