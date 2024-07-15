@@ -5,6 +5,23 @@ class Level {
     new DecorationObject(-830, 280, 300, 150, "/img/objects/cars/yellow-car.png"),
     new DecorationObject(-560, 350, 60, 80, "/img/objects/water-hydrant/001-003.png"),
     new FireAnimation(-590, 220, 50, 150),
+    new DecorationObject(700, 351, 170, 80, "/img/objects/bench/002.png"),
+    new DecorationObject(650, 390, 40, 40, "/img/objects/basket/001.png"),
+    new DecorationObject(2310, 388, 45, 45, "/img/objects/box/dead/005-002.png"),
+    new FireAnimation(2310, 293, 40, 120),
+    new Bird(-270, 52),
+    new Bird(393, 158),
+    new Bird(3910, 112),
+    new Bird(3950, 106),
+    new Cat(2240, 375, "dark"),
+    new DecorationObject(
+      4230,
+      60,
+      880,
+      600,
+      "/img/objects/enemy-ship/Ship3.png",
+      "/audio/objects/alien-ship.mp3"
+    ),
   ];
   backgroundObjects1 = [];
   backgroundObjects2 = [];
@@ -16,6 +33,30 @@ class Level {
   constructor(enemiesAmount, dronesAmount) {
     this.generateLevel(enemiesAmount, dronesAmount);
     this.constructBackground();
+    this.generateStreetLights();
+    this.generateAdvertising();
+  }
+
+  generateAdvertising() {
+    this.decorations.push(
+      new DecorationObject(-130, 240, 90, 45, "/img/objects/advertising/128x64/5.png"),
+      new DecorationObject(1970, 110, 120, 68, "/img/objects/advertising/128x64/12.png"),
+      new DecorationObject(2765, 287, 105, 75, "/img/objects/advertising/128x64/1.png"),
+      new DecorationObject(3643, 155, 90, 45, "/img/objects/advertising/128x64/3.png"),
+      new DecorationObject(401, 190, 40, 80, "/img/objects/advertising/22x40/4.png"),
+      new DecorationObject(2500, 162, 40, 70, "/img/objects/advertising/22x40/15.png"),
+      new DecorationObject(3923, 210, 30, 80, "/img/objects/advertising/22x40/6.png"),
+      new DecorationObject(4682, 113, 60, 143, "/img/objects/advertising/22x40/14.png"),
+      new DecorationObject(-390, 295, 40, 40, "/img/objects/advertising/64x64/10.png"),
+      new DecorationObject(1348, 258, 55, 55, "/img/objects/advertising/64x64/8.png")
+    );
+  }
+
+  generateStreetLights() {
+    for (let i = -280; i < 6000; i += 880) {
+      let streetLight = new DecorationObject(i, 80, 50, 350, "/img/objects/street-lamp/003.png");
+      this.decorations.push(streetLight);
+    }
   }
 
   generateLevel(enemiesAmount, dronesAmount) {
@@ -29,8 +70,6 @@ class Level {
       drones.push(new Drone(9500));
       this.drones = drones;
     }
-    let endBoss = new EndBoss();
-    //this.enemies.push(endBoss);
   }
 
   constructBackground() {

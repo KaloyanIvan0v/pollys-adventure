@@ -10,20 +10,16 @@ class ThrowableObject extends MovableObject {
     this.speedY = speedY;
     this.fallSpeed = fallSpeed;
     this.onGround = false;
-    this.throw();
   }
 
   throw() {
-    this.applyGravity(this.fallSpeed);
-    setInterval(() => {
-      if (!gamePaused) {
-        if (this.isAboveGround()) {
-          this.x += this.speedX;
-        } else {
-          this.speedX = 0;
-          this.speedY = 0;
-        }
+    if (!gamePaused) {
+      if (this.isAboveGround()) {
+        this.x += this.speedX;
+      } else {
+        this.speedX = 0;
+        this.speedY = 0;
       }
-    }, 25);
+    }
   }
 }

@@ -25,8 +25,12 @@ class GameMenu {
   leftButton = new Button(0.08, 0.89, 0.08, 0.12, this.LEFT_BUTTON);
   rightButton = new Button(0.22, 0.89, 0.08, 0.12, this.RIGHT_BUTTON);
   upButton = new Button(0.75, 0.89, 0.08, 0.12, this.UP_BUTTON);
+  throwButton = new Button(0.79, 0.69, 0.08, 0.12, [
+    "/img/GUI/buttons/throw.png",
+    "/img/GUI/buttons/throw.png",
+  ]);
 
-  mobileButtons = [this.leftButton, this.rightButton, this.upButton];
+  mobileButtons = [this.leftButton, this.rightButton, this.upButton, this.throwButton];
 
   controlButtons = [
     this.soundButton,
@@ -69,7 +73,7 @@ class GameMenu {
     this.settingsButton.animate(x_move, y_move, x_click, y_click, toggleGameMenu);
     this.soundButton.animate(x_move, y_move, x_click, y_click, toggleSound);
     this.playPauseButton.animate(x_move, y_move, x_click, y_click, togglePlayPause);
-    this.infoButton.animate(x_move, y_move, x_click, y_click);
+    this.infoButton.animate(x_move, y_move, x_click, y_click, toggleHowToPlay);
     this.reloadButton.animate(x_move, y_move, x_click, y_click, reload);
     this.fullscreenButton.animate(x_move, y_move, x_click, y_click, toggleFullscreen);
     this.animateMobileButtons();
@@ -84,9 +88,11 @@ class GameMenu {
       this.leftButton.animate(x_move, y_move, x_click, y_click, leftButtonClick);
       this.rightButton.animate(x_move, y_move, x_click, y_click, rightButtonClick);
       this.upButton.animate(x_move, y_move, x_click, y_click, upButtonClick);
+      this.throwButton.animate(x_move, y_move, x_click, y_click, throwButtonClick);
       this.leftButton.isTouched(leftButtonClick, leftButtonClick);
       this.rightButton.isTouched(rightButtonClick, rightButtonClick);
       this.upButton.isTouched(upButtonClick, upButtonClick);
+      this.throwButton.isTouched(throwButtonClick, throwButtonClick);
       this.animateMenuMobileButtons();
     }
   }
@@ -95,7 +101,7 @@ class GameMenu {
     this.settingsButton.isTouched(toggleGameMenu);
     this.soundButton.isTouched(toggleSound);
     this.playPauseButton.isTouched(togglePlayPause);
-    this.infoButton.isTouched();
+    this.infoButton.isTouched(toggleHowToPlay);
     this.reloadButton.isTouched(reload);
     this.fullscreenButton.isTouched(toggleFullscreen);
   }

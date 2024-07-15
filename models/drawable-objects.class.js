@@ -58,6 +58,14 @@ class DrawableObject extends Sound {
     ctx.restore();
   }
 
+  rotateImg(obj, img, angle) {
+    world.ctx.save();
+    world.ctx.translate(obj.x + obj.width / 2, obj.y + obj.height / 2);
+    world.ctx.rotate((angle * Math.PI) / 180);
+    world.ctx.drawImage(img, -obj.width / 2, -obj.height / 2, obj.width, obj.height);
+    world.ctx.restore();
+  }
+
   hitGround() {
     if (this.y >= 400) {
       return true;

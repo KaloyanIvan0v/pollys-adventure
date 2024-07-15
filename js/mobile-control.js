@@ -2,6 +2,7 @@ let activeTouchPoints = new Map();
 let moveLeft = false;
 let moveRight = false;
 let moveUp = false;
+let throwPressed = false;
 function watchLoop() {
   setInterval(() => {
     updateControlButtons();
@@ -19,7 +20,6 @@ function leftButtonClick(buttonPressed) {
   } else {
     moveLeft = false;
   }
-  console.log("left");
 }
 
 function rightButtonClick(buttonPressed) {
@@ -36,6 +36,18 @@ function upButtonClick(buttonPressed) {
   } else {
     moveUp = false;
   }
+}
+
+function throwButtonClick(buttonPressed) {
+  if (buttonPressed) {
+    throwPressed = true;
+  } else {
+    throwPressed = false;
+  }
+}
+
+function throwButtonReleased() {
+  throwPressed = false;
 }
 
 function touchEvents() {

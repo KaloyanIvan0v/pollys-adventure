@@ -13,6 +13,8 @@ let gameMenu = false;
 let gameLoopTicks = 0;
 let fullscreen = false;
 let lastHoveredButton;
+let renderSpeed = 60;
+let gameWon = false;
 
 function init() {
   refreshCanvas();
@@ -34,6 +36,7 @@ function toggleFullscreen() {
 }
 
 function playAgain() {
+  console.log("playAgain");
   holdWorld = false;
   reload();
 }
@@ -49,7 +52,12 @@ function backHome() {
 function startGame() {
   startScreen.stopLoop();
   loadGame();
-  muteSound = false;
+  setTimeout(() => {
+    // avoid -> interact with the document first error
+    muteSound = false;
+    gamePaused = true;
+  }, 200);
+
   screenOrientationListener();
 }
 
@@ -59,6 +67,16 @@ function reload() {
 
 function toggleGameMenu() {
   gameMenu = !gameMenu;
+}
+
+function toggleHowToPlay() {
+  if (world.howToPlayShown) {
+    world.howToPlayShown = false;
+    togglePlayPause();
+  } else {
+    world.howToPlayShown = true;
+    togglePlayPause();
+  }
 }
 
 function loadStartScreen() {
@@ -72,6 +90,18 @@ function loadGame() {
   canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
   gameRuns = true;
+}
+
+function executeOnEveryMouseClick() {
+  closeHowToPlayOnFreeClick();
+}
+
+function closeHowToPlayOnFreeClick() {
+  if (world != undefined) {
+    if (world.howToPlayShown && world != undefined) {
+      toggleHowToPlay();
+    }
+  }
 }
 
 function toggleSound() {

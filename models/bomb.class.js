@@ -20,11 +20,13 @@ class Bomb extends ThrowableObject {
   objLoop() {
     this.ifBombHitGround() ? this.bombExplode() : this.bombDoNotExplode();
     this.adjustSoundVolumeByDistance(this.world.character, this);
+    this.applyGravity(0.2);
+    this.throw();
   }
 
   explodeAnimation() {
     if (this.animationStillRunning()) {
-      this.playAnimation(this.IMAGE_EXPLODE, 0.08);
+      this.playAnimation(this.IMAGE_EXPLODE, 0.02);
       this.playLastSound(this.bomb_explosion, 0.3, soundVolumeGame);
     } else {
       this.explodedBombState();

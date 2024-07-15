@@ -9,10 +9,12 @@
   <link rel="icon" type="image/x-icon" href="/img/characters/dog/idle/004-000.png">
   <link rel="stylesheet" href="style.css">
 
-
+  <script src="/library/perlin.js"></script>
   <script src="/models/sound.class.js"></script>
   <script src="/models/drawable-objects.class.js"></script>
   <script src="/models/movable-objects.class.js"></script>
+  <script src="/models/cat.class.js"></script>
+  <script src="/models/bird.class.js"></script>
   <script src="/models/animations/collect-animation.class.js"></script>
   <script src="/models/animations/fire-animation.class.js"></script>
   <script src="/models/decoration-object.class.js"></script>
@@ -47,11 +49,7 @@
 
 <body onload="init()">
   <img class="headline-img" src="/img/background/background-img/Polly`s.png" alt="">
-  <canvas id="canvas" width="720" height="480">
-    <div id="testButton" class="button" onclick="playInFullscreen()">
-      <h1>Polly's Adventure</h1>
-    </div>
-  </canvas>
+  <canvas id="canvas" width="720" height="480"></canvas>
   <img class="dog-background" src="/img/background/background-img/dog.png" alt="">
   <img class="enemy-big-background" src="/img/background/background-img/enemy-big.png" alt="">
   <img class="enemy-small-background" src="/img/background/background-img/enemy-small.png" alt="">

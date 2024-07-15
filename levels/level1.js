@@ -1,1 +1,1 @@
-let level1 = new Level(3, 1);
+let level1 = new Level(12, 1);

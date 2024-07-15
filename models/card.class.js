@@ -21,6 +21,8 @@ class Card extends ThrowableObject {
   }
 
   objLoop() {
+    this.applyGravity(0.5);
+    this.throw();
     if (this.hitObject) {
       if (this.animationStillRunning()) {
         this.explodeAnimation();

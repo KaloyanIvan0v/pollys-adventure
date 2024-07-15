@@ -58,5 +58,6 @@ class StartScreen extends MovableObject {
       toggleSound
     );
     this.playButton.isTouched(startGame);
+    this.soundButton.isTouched(toggleSound);
   }
 }

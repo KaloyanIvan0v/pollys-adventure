@@ -1,5 +1,5 @@
 class CardCannon extends MovableObject {
-  x = 400;
+  x = 1680;
   y = 361;
   width = 80;
   height = 70;
@@ -126,8 +126,8 @@ class CardCannon extends MovableObject {
   }
 
   throwCard(list) {
-    let x_Speed = -3 + Math.random() * -7;
-    let card = new Card(this.x, this.y, x_Speed, 25, 40);
+    let x_Speed = -1 + Math.random() * -5;
+    let card = new Card(this.x, this.y, x_Speed, 15, 40);
     card.harmful = false;
     this.playSound(this.throw);
     setTimeout(() => {

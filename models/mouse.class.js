@@ -14,6 +14,7 @@ class Mouse {
     element.addEventListener("click", (event) => {
       this.updateMouseClick(event, element);
       this.clickEnabled = true;
+      executeOnEveryMouseClick();
     });
   }
 

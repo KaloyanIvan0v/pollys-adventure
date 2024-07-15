@@ -44,14 +44,13 @@ class Character extends MovableObject {
 
   constructor() {
     super().loadImg("/img/characters/dog/idle/004-000.png");
-    this.y = 280;
-    this.x = -440;
+    this.y = 255;
+    this.x = -450;
     this.speedX = 0.34;
     this.playSound(this.greetingSound);
     this.loadImages(this.IMAGES_IDLE);
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_DEATH);
-    this.applyGravity(40);
   }
 
   objLoop() {
@@ -62,6 +61,7 @@ class Character extends MovableObject {
     this.calculateCardsPercentage();
     this.areaDamage(world.throwableObjects);
     this.checkForCollectibleItems(world.throwableObjects);
+    this.applyGravity(0.5);
   }
 
   resetCharacter() {
@@ -70,8 +70,8 @@ class Character extends MovableObject {
     this.speedY = 0;
     this.speedX = 0.34;
     this.flipImg = false;
-    this.x = -440;
-    this.y = 280;
+    this.x = -450;
+    this.y = 255;
   }
 
   handleCharacterMovement() {
@@ -131,7 +131,7 @@ class Character extends MovableObject {
 
   hurt(harmful) {
     if (this.energy > 0 && harmful) {
-      this.energy = this.energy - 0.5;
+      this.energy = this.energy - 2;
     }
   }
 
@@ -162,7 +162,7 @@ class Character extends MovableObject {
         if (!this.isAboveGround()) {
           this.hurt(enemy.harmful);
         }
-        enemy.harmful ? (this.collisionDetected = true) : null;
+        enemy.harmful ? (this.collisionDetected = true) : (this.collisionDetected = false);
       }
     });
     this.currentCollisionState = this.collisionDetected;
@@ -219,25 +219,19 @@ class Character extends MovableObject {
   }
 
   increaseCardAmount() {
-    if (this.cardAmount < 6) {
+    if (this.cardAmount < 10) {
       this.cardAmount++;
     }
   }
   calculateCardsPercentage() {
     if (this.cardAmount > 0) {
-      this.cardPercent = (this.cardAmount / 6) * 100;
+      this.cardPercent = (this.cardAmount / 10) * 100;
     } else {
       this.cardPercent = 0;
     }
   }
 
   animateCollectToBar() {
-    let collectAnimation = new CollectAnimation(
-      this.x,
-      this.y,
-      20,
-      30,
-      "/img/objects/card/003-000.png"
-    );
+    new CollectAnimation(this.x, this.y, 20, 30, "/img/objects/card/003-000.png");
   }
 }

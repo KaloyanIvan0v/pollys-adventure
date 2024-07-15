@@ -4,7 +4,7 @@ class MovableObject extends DrawableObject {
   acceleration = 1;
   energy = 100;
   flipImg = false;
-  currentCollisionState;
+  currentCollisionState = false;
   collisionDetected;
   alreadyDead = false;
   onGround = true;
@@ -15,14 +15,12 @@ class MovableObject extends DrawableObject {
   }
 
   applyGravity(fallSpeed) {
-    setInterval(() => {
-      if (!gamePaused) {
-        if (this.isAboveGround() || this.speedY > 0) {
-          this.y -= this.speedY;
-          this.speedY -= this.acceleration;
-        }
+    if (!gamePaused) {
+      if (this.isAboveGround() || this.speedY > 0) {
+        this.y -= this.speedY;
+        this.speedY -= this.acceleration * fallSpeed;
       }
-    }, 1000 / fallSpeed);
+    }
   }
 
   isAboveGround() {
@@ -39,22 +37,6 @@ class MovableObject extends DrawableObject {
     this.flipImg = flipImg;
   }
 
-  playAnimation(images, animationSpeed) {
-    const now = Date.now();
-    if (now - this.lastFrameTime >= animationSpeed) {
-      let i = this.currentImg % images.length;
-      let path = images[i];
-      let img = this.imgCache[path];
-      this.ifObjIsHurtApplyFilter(img, i);
-      this.img = img;
-      this.currentImg++;
-      this.lastFrameTime = now;
-      this.currentImg <= images.length - 1
-        ? (this.animationRunOnce = false)
-        : (this.animationRunOnce = true);
-    }
-  }
-
   ifObjIsHurtApplyFilter(img, i) {
     if (i % 2 === 1 && this.isHurt()) {
       img = this.applyFilter(img);
@@ -62,7 +44,7 @@ class MovableObject extends DrawableObject {
   }
 
   jump() {
-    this.speedY = 13;
+    this.speedY = 8;
   }
 
   isColliding(obj) {
@@ -83,7 +65,7 @@ class MovableObject extends DrawableObject {
   }
 
   isJump() {
-    return this.speedY > -13 ? true : false;
+    return this.speedY > -8 ? true : false;
   }
 
   objMoves() {
@@ -117,39 +99,51 @@ class MovableObject extends DrawableObject {
     }
   }
 
-  applyFilter(img) {
-    const { canvas, ctx } = this.createCanvasWithImage(img);
-    this.filterImageData(ctx, canvas.width, canvas.height);
-    return this.createImageFromCanvas(canvas);
+  playAnimation(images, animationSpeed) {
+    const now = Date.now();
+    if (now - this.lastFrameTime >= animationSpeed) {
+      const currentIndex = this.currentImg % images.length;
+      const imagePath = images[currentIndex];
+      const img = this.imgCache[imagePath];
+      if (img) {
+        if (this.isHurt() && this.currentImg % 2 === 1) {
+          this.img = this.applyRedFilter(img);
+        } else {
+          this.img = img;
+        }
+        this.currentImg++;
+        this.lastFrameTime = now;
+        this.animationRunOnce = this.currentImg >= images.length;
+      } else {
+        console.error(`Image not found in cache: ${imagePath}`);
+      }
+    }
   }
 
-  createCanvasWithImage(img) {
+  applyRedFilter(img) {
     const canvas = document.createElement("canvas");
     canvas.width = img.width;
     canvas.height = img.height;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
-    return { canvas, ctx };
-  }
 
-  filterImageData(ctx, width, height) {
-    let imageData = ctx.getImageData(0, 0, width, height);
-    let data = imageData.data;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
     for (let i = 0; i < data.length; i += 4) {
-      data[i + 1] = 0;
-      data[i + 2] = 0;
+      data[i] = 255;
+      data[i + 1] = 20;
+      data[i + 2] = 80;
     }
-    ctx.putImageData(imageData, 0, 0);
-  }
 
-  createImageFromCanvas(canvas) {
+    ctx.putImageData(imageData, 0, 0);
     const filteredImg = new Image();
     filteredImg.src = canvas.toDataURL();
     return filteredImg;
   }
 
   setRandomXPosition() {
-    this.x = 300 + Math.random() * 4000;
+    this.x = 300 + Math.random() * 4100;
   }
 
   setRandomXSpeed() {

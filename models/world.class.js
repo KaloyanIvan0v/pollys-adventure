@@ -4,6 +4,7 @@ class World extends Sound {
   keyboard;
   camera_x = 0;
   level = level1;
+  howToPlayShown = true;
 
   character = new Character();
   cardCannon = new CardCannon();
@@ -12,15 +13,24 @@ class World extends Sound {
   statusBarCardsImg = new StatusBarImg(12, 55, "/img/objects/card/003-000.png");
   statusBarBombImg = new StatusBarImg(13, 100, "/img/objects/bomb/idle/0.png");
   gameMenu = new GameMenu(0, 0);
-  endScreen = new EndScreen();
-  backgroundMusic = new Audio("/audio/mysterious-melody-loop-197040.mp3");
+  endScreenLose = new EndScreen("/img/GUI/end-screen.png", "/audio/lose.mp3");
+  endScreenWin = new EndScreen("/img/GUI/win-screen.png", "/audio/won.mp3");
+  backgroundMusic = new Audio("/audio/mysterious-melody-loop-197040.mp3", "/audio/won.mp3");
   throwCard = new Audio("/audio/objects/throw-card.mp3");
+  howToPlay = new DecorationObject(
+    10,
+    10,
+    640,
+    400,
+    "/img/background/gameInstructions/how-to-play.png"
+  );
 
   animations = [];
   throwableObjects = [];
   backgroundObjects = level1.backgroundObjects;
   alreadyThrown = false;
   lastCtxTranslate = 1;
+  endBossActivated = false;
   intervalId;
 
   constructor(canvas, keyboard) {
@@ -45,8 +55,13 @@ class World extends Sound {
         this.draw();
         this.guiEvents();
       } else {
-        this.drawEndScreen();
-        this.stopAllSounds();
+        if (gameWon) {
+          this.stopAllSounds();
+          this.drawWinScreen();
+        } else {
+          this.stopAllSounds();
+          this.drawEndScreen();
+        }
       }
     }, 1000 / 60);
   }
@@ -71,12 +86,14 @@ class World extends Sound {
     this.removeExplodedThrownObjects();
     this.checkCardCollision();
     this.animateDecorations();
+    this.activateEndBoss();
+    this.checkIfEndBossDead();
   }
 
   guiEvents() {
     gamePaused
       ? this.character.playSound(this.backgroundMusic, 0.03, soundVolumeGUI)
-      : this.character.playSound(this.backgroundMusic, 0.06, soundVolumeGUI);
+      : this.character.playSound(this.backgroundMusic, 0.03, soundVolumeGUI);
     this.gameMenu.animate();
   }
 
@@ -139,6 +156,7 @@ class World extends Sound {
     this.gameMenu.returnButtons().forEach((button) => {
       this.addToMap(button);
     });
+    this.howToPlayShown ? this.addToMap(this.howToPlay) : null;
   }
 
   drawParallaxBackgroundLayers() {
@@ -169,20 +187,25 @@ class World extends Sound {
   }
 
   restartGame() {
-    this.level = new Level(3, 1);
+    this.level = new Level(12, 1);
     this.throwableObjects = [];
     this.enemies = [];
     this.stopAllSounds();
     this.character.resetCharacter();
     gamePaused = false;
     soundVolumeGame = 1;
+    gameWon = false;
+    this.endBossActivated = false;
   }
 
   stopAllSounds() {
-    activeSounds.forEach((sound) => {
-      sound.pause();
-      sound.currentTime = 0;
-    });
+    if (activeSounds.length > 2) {
+      activeSounds.forEach((sound) => {
+        sound.pause();
+        sound.currentTime = 0;
+      });
+      activeSounds = [];
+    }
   }
 
   updateStatusBars() {
@@ -211,13 +234,14 @@ class World extends Sound {
   buttonResizeUpdate() {
     setTimeout(() => {
       this.gameMenu = new GameMenu(0, 0);
-      this.endScreen = new EndScreen();
+      this.endScreenLose = new EndScreen("/img/GUI/end-screen.png", "/audio/lose.mp3");
+      this.endScreenWin = new EndScreen("/img/GUI/win-screen.png", "/audio/won.mp3");
     }, 200);
   }
 
   checkThrowableObjects() {
-    if (this.keyboard.T && !this.alreadyThrown && this.character.cardAmount > 0) {
-      let card = new Card(this.character.x, this.character.y, 13, 15, 40);
+    if ((this.keyboard.T || throwPressed) && !this.alreadyThrown && this.character.cardAmount > 0) {
+      let card = new Card(this.character.x, this.character.y, 7, 9, 40);
       card.harmful = true;
       this.playSound(this.throwCard);
       this.throwableObjects.push(card);
@@ -230,7 +254,7 @@ class World extends Sound {
   }
 
   checkIfTisUp() {
-    if (!this.keyboard.T) {
+    if (!this.keyboard.T && !throwPressed) {
       this.alreadyThrown = false;
     }
   }
@@ -240,8 +264,13 @@ class World extends Sound {
   }
 
   drawEndScreen() {
-    this.endScreen.draw(this.ctx);
-    this.endScreen.animate();
+    this.endScreenLose.draw(this.ctx);
+    this.endScreenLose.animate();
+  }
+
+  drawWinScreen() {
+    this.endScreenWin.draw(this.ctx);
+    this.endScreenWin.animate();
   }
 
   addDecorationsToMap() {
@@ -280,15 +309,17 @@ class World extends Sound {
 
   checkIfCardCollidingWithEnemies(object) {
     this.level.enemies.forEach((enemy) => {
-      if (object.isColliding(enemy) && object.harmful == true && enemy.alreadyDead == false) {
-        object.hitObject = true;
-        enemy.energy -= 100;
-        enemy.harmful = false;
-        setTimeout(() => {
-          if (object.alreadyDead) {
-            this.throwableObjects.splice(this.throwableObjects.indexOf(object), 1);
+      if (object.isColliding(enemy) && object.harmful && !enemy.alreadyDead) {
+        const currentTime = Date.now();
+        if (!enemy.lastHitTime || currentTime - enemy.lastHitTime >= 1000) {
+          object.hitObject = true;
+          enemy.energy -= 100;
+          if (enemy.energy <= 0) {
+            enemy.energy = 0;
+            enemy.harmful = false;
           }
-        }, 100);
+          enemy.lastHitTime = currentTime;
+        }
       }
     });
   }
@@ -296,11 +327,9 @@ class World extends Sound {
   checkIfCollidingWithGround(object) {
     if (object instanceof Card && !object.isAboveGround()) {
       object.hitObject = true;
-      setTimeout(() => {
-        if (object.alreadyDead) {
-          this.throwableObjects.splice(this.throwableObjects.indexOf(object), 1);
-        }
-      }, 100);
+      if (object.alreadyDead) {
+        this.throwableObjects.splice(this.throwableObjects.indexOf(object), 1);
+      }
     }
   }
 
@@ -313,11 +342,28 @@ class World extends Sound {
     });
     if (deadEnemies.length > 2) {
       this.level.enemies.forEach((enemy) => {
-        if (enemy.alreadyDead) {
+        if (enemy.alreadyDead && enemy instanceof SmallEnemy) {
           this.level.enemies.splice(this.level.enemies.indexOf(enemy), 1);
           return;
         }
       });
     }
+  }
+
+  activateEndBoss() {
+    if (this.character.x > 3000 && this.endBossActivated == false) {
+      this.endBossActivated = true;
+      this.level.enemies.push(new EndBoss());
+    }
+  }
+
+  checkIfEndBossDead() {
+    this.level.enemies.forEach((enemy) => {
+      if (enemy instanceof EndBoss && enemy.alreadyDead) {
+        gameWon = true;
+        holdWorld = true;
+      } else {
+      }
+    });
   }
 }
