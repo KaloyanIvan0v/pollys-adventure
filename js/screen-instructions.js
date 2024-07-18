@@ -112,5 +112,5 @@ function removeFullScreenInstruction() {
 function playInFullscreen() {
   removeFullScreenInstruction();
   enterFullScreen();
-  world.buttonResizeUpdate();
+  world ? world.buttonResizeUpdate() : null;
 }

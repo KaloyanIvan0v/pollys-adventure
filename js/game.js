@@ -98,7 +98,6 @@ function toggleGameMenu() {
  * Function to toggle the "How to Play" instructions.
  */
 function toggleHowToPlay() {
-  console.log("howToPlayShown: ", world.howToPlayShown);
   if (world.howToPlayShown) {
     world.howToPlayShown = false;
     gamePaused ? togglePlayPause() : null;
@@ -287,6 +286,5 @@ function initTouchListener() {
  * Function to execute when the device changes.
  */
 function executeOnDeviceChange() {
-  console.log("Device changed");
   world != undefined ? world.buttonResizeUpdate() : null;
 }

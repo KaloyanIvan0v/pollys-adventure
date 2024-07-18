@@ -40,7 +40,7 @@ class Character extends MovableObject {
   walking;
   alreadyWalking = false;
   canTakeDamage = true;
-  cardAmount = 20;
+  cardAmount = 0;
   cardPercent = 0;
 
   /**
