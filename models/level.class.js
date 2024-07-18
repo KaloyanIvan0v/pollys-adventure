@@ -30,6 +30,11 @@ class Level {
   backgroundObjects5 = [];
   level_end_x = 4300;
 
+  /**
+   * Creates a new level with specified numbers of enemies and drones.
+   * @param {number} enemiesAmount - Number of enemies in the level.
+   * @param {number} dronesAmount - Number of drones in the level.
+   */
   constructor(enemiesAmount, dronesAmount) {
     this.generateLevel(enemiesAmount, dronesAmount);
     this.constructBackground();
@@ -37,6 +42,9 @@ class Level {
     this.generateAdvertising();
   }
 
+  /**
+   * Generates advertising decoration objects and adds them to decorations.
+   */
   generateAdvertising() {
     this.decorations.push(
       new DecorationObject(-130, 240, 90, 45, "/img/objects/advertising/128x64/5.png"),
@@ -52,6 +60,9 @@ class Level {
     );
   }
 
+  /**
+   * Generates street lights decoration objects and adds them to decorations.
+   */
   generateStreetLights() {
     for (let i = -280; i < 6000; i += 880) {
       let streetLight = new DecorationObject(i, 80, 50, 350, "/img/objects/street-lamp/003.png");
@@ -59,6 +70,11 @@ class Level {
     }
   }
 
+  /**
+   * Generates enemies and drones for the level.
+   * @param {number} enemiesAmount - Number of enemies to generate.
+   * @param {number} dronesAmount - Number of drones to generate.
+   */
   generateLevel(enemiesAmount, dronesAmount) {
     let enemies = [];
     let drones = [];
@@ -72,8 +88,21 @@ class Level {
     }
   }
 
+  /**
+   * Constructs background objects for the level.
+   */
   constructBackground() {
     let backgroundImages = [[], [], [], [], []];
+    this.constructBackgroundLayers(backgroundImages);
+    this.constructGroundTiles(backgroundImages);
+    this.setBackgroundObjects(backgroundImages);
+  }
+
+  /**
+   * Constructs background layers and populates them into the provided backgroundImages array.
+   * @param {Array<Array<BackgroundObject>>} backgroundImages - Array of arrays to store background objects for each layer.
+   */
+  constructBackgroundLayers(backgroundImages) {
     for (let i = -1; i < 7; i++) {
       for (let j = 0; j < 5; j++) {
         let obj = new BackgroundObject(
@@ -86,11 +115,25 @@ class Level {
         backgroundImages[j].push(obj);
       }
     }
+  }
+
+  /**
+   * Constructs ground tiles and populates them into the provided backgroundImages array.
+   * @param {Array<Array<BackgroundObject>>} backgroundImages - Array of arrays to store background objects for each layer.
+   */
+  constructGroundTiles(backgroundImages) {
     for (let i = -15; i < 100; i++) {
       backgroundImages[0].push(
         new BackgroundObject("/img/background/ground/Tile_02.png", 50 * i, 429, 50, 50)
       );
     }
+  }
+
+  /**
+   * Sets the background objects arrays for different layers from the provided backgroundImages.
+   * @param {Array<Array<BackgroundObject>>} backgroundImages - Array of arrays containing background objects for each layer.
+   */
+  setBackgroundObjects(backgroundImages) {
     this.backgroundObjects1 = backgroundImages[0];
     this.backgroundObjects2 = backgroundImages[1];
     this.backgroundObjects3 = backgroundImages[2];

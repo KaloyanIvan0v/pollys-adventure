@@ -1,4 +1,11 @@
+@font-face {
+  font-family: "open-sans";
+  src: url("/fonts/open-sans/OpenSans-VariableFont_wdth\,wght.ttf");
+}
+
 body {
+  font-family: "open-sans";
+  font-weight: 300;
   display: flex;
   justify-content: top;
   align-items: center;
@@ -107,8 +114,32 @@ body {
   height: 80%;
 }
 
+.btn {
+  text-decoration: none;
+  color: rgb(188, 80, 80);
+  font-size: 20px;
+  border-radius: 10px;
+  padding: 5px 15px;
+}
+
+.btn:hover {
+  color: rgb(255, 0, 0);
+}
+
 .d-none {
   display: none;
+}
+
+footer {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: white;
+  z-index: 11;
 }
 
 @media (max-height: 1000px) {

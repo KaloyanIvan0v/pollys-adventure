@@ -8,6 +8,11 @@ class EndScreen extends MovableObject {
   buttonBackToMenu;
   sound;
 
+  /**
+   * Creates a new end screen object.
+   * @param {string} imgPath - Path to the end screen image.
+   * @param {string} soundPath - Path to the end screen sound.
+   */
   constructor(imgPath, soundPath) {
     super();
     this.sound = new Audio(soundPath);
@@ -20,17 +25,27 @@ class EndScreen extends MovableObject {
     this.loadImg(this.END_SCREEN);
   }
 
+  /**
+   * Animates the end screen, including button events and sound.
+   */
   animate() {
     this.buttonEvents();
     this.playLastSound(this.sound, 1);
   }
 
+  /**
+   * Draws the end screen and its buttons.
+   * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+   */
   draw(ctx) {
     this.endScreen.draw(ctx);
     this.buttonBackToMenu.draw(ctx);
     this.buttonPlayAgain.draw(ctx);
   }
 
+  /**
+   * Handles button events based on mouse movements and clicks.
+   */
   buttonEvents() {
     let x_move = mouse.lastMove.x;
     let y_move = mouse.lastMove.y;

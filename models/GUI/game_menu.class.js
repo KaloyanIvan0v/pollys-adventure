@@ -1,4 +1,8 @@
+/**
+ * Represents a game menu with various control buttons.
+ */
 class GameMenu {
+  // Instance variables for position and button definitions
   x;
   y;
   x_mainButton;
@@ -10,7 +14,6 @@ class GameMenu {
   RELOAD_BUTTON = ["/img/GUI/buttons/reload.png", "/img/GUI/buttons/reload.png"];
   SETTINGS_BUTTON = ["/img/GUI/buttons/i.png", "/img/GUI/buttons/i.png"];
   fullscreen_BUTTON = ["/img/GUI/buttons/fullscreen.png", "/img/GUI/buttons/fullscreen.png"];
-
   LEFT_BUTTON = ["/img/GUI/buttons/left.png", "/img/GUI/buttons/left.png"];
   RIGHT_BUTTON = ["/img/GUI/buttons/right.png", "/img/GUI/buttons/right.png"];
   UP_BUTTON = ["/img/GUI/buttons/up.png", "/img/GUI/buttons/up.png"];
@@ -21,7 +24,6 @@ class GameMenu {
   infoButton = new Button(this.x_menuButtons, 0.42, 0.06, 0.09, this.INFO_BUTTON);
   reloadButton = new Button(this.x_menuButtons, 0.54, 0.06, 0.09, this.RELOAD_BUTTON);
   fullscreenButton = new Button(this.x_menuButtons, 0.66, 0.06, 0.09, this.fullscreen_BUTTON);
-
   leftButton = new Button(0.08, 0.89, 0.08, 0.12, this.LEFT_BUTTON);
   rightButton = new Button(0.22, 0.89, 0.08, 0.12, this.RIGHT_BUTTON);
   upButton = new Button(0.75, 0.89, 0.08, 0.12, this.UP_BUTTON);
@@ -40,17 +42,28 @@ class GameMenu {
     this.fullscreenButton,
   ];
 
+  /**
+   * Constructs a GameMenu instance with specified coordinates.
+   * @param {number} x - The x-coordinate of the menu.
+   * @param {number} y - The y-coordinate of the menu.
+   */
   constructor(x, y) {
     this.x = x;
     this.y = y;
   }
 
+  /**
+   * Animates the buttons in the game menu.
+   */
   animate() {
     this.animateButtons();
-    //this.handleCursorPointer(mouse.lastMove);
     this.updateButtonPosition();
   }
 
+  /**
+   * Returns an array of all buttons in the game menu.
+   * @returns {Array} Array of Button instances.
+   */
   returnButtons() {
     let buttons = [this.settingsButton];
     this.controlButtons.forEach((button) => {
@@ -64,6 +77,9 @@ class GameMenu {
     return buttons;
   }
 
+  /**
+   * Animates all buttons in the game menu.
+   */
   animateButtons() {
     let x_move = mouse.lastMove.x;
     let y_move = mouse.lastMove.y;
@@ -79,6 +95,9 @@ class GameMenu {
     this.animateMobileButtons();
   }
 
+  /**
+   * Animates the mobile-specific buttons in the game menu.
+   */
   animateMobileButtons() {
     let x_move = mouse.lastMove.x;
     let y_move = mouse.lastMove.y;
@@ -97,6 +116,9 @@ class GameMenu {
     }
   }
 
+  /**
+   * Animates the mobile-specific menu buttons.
+   */
   animateMenuMobileButtons() {
     this.settingsButton.isTouched(toggleGameMenu);
     this.soundButton.isTouched(toggleSound);
@@ -106,6 +128,9 @@ class GameMenu {
     this.fullscreenButton.isTouched(toggleFullscreen);
   }
 
+  /**
+   * Updates the position of the buttons based on the game menu state (show/hide).
+   */
   updateButtonPosition() {
     if (gameMenu) {
       this.gameMenuShowButtons();
@@ -114,6 +139,9 @@ class GameMenu {
     }
   }
 
+  /**
+   * Sets the position of control buttons to show them in the game menu.
+   */
   gameMenuShowButtons() {
     this.controlButtons.forEach((button) => {
       button.x = 0.91 * canvas.width;
@@ -121,6 +149,9 @@ class GameMenu {
     });
   }
 
+  /**
+   * Sets the position of control buttons to hide them from the game menu.
+   */
   gameMenuHideButtons() {
     this.controlButtons.forEach((button) => {
       button.x = 1.5 * canvas.width;
@@ -128,11 +159,17 @@ class GameMenu {
     });
   }
 
+  /**
+   * Updates the images for buttons that represent sound and play/pause states.
+   */
   updateButtonImg() {
     this.updateImgForSoundButton();
     this.updateButtonImgForPlayPauseButton();
   }
 
+  /**
+   * Updates the image for the sound button based on the current sound state (muted/unmuted).
+   */
   updateImgForSoundButton() {
     if (muteSound) {
       this.soundButton.img = this.soundButton.imgCache[this.soundButton.images[1]];
@@ -141,6 +178,9 @@ class GameMenu {
     }
   }
 
+  /**
+   * Updates the image for the play/pause button based on the current game state (paused/playing).
+   */
   updateButtonImgForPlayPauseButton() {
     if (gamePaused) {
       this.playPauseButton.img = this.playPauseButton.imgCache[this.playPauseButton.images[1]];
