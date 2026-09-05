@@ -1,43 +1,43 @@
 class Drone extends MovableObject {
   IMG_WALKING = [
-    "/img/characters/drone/walk/005-000.png",
-    "/img/characters/drone/walk/005-001.png",
-    "/img/characters/drone/walk/005-002.png",
-    "/img/characters/drone/walk/005-003.png",
-  ];
-  IMG_IDLE = ["/img/characters/drone/idle/004-000.png", "/img/characters/drone/idle/004-001.png"];
+    '/img/characters/drone/walk/005-000.png',
+    '/img/characters/drone/walk/005-001.png',
+    '/img/characters/drone/walk/005-002.png',
+    '/img/characters/drone/walk/005-003.png',
+  ]
+  IMG_IDLE = ['/img/characters/drone/idle/004-000.png', '/img/characters/drone/idle/004-001.png']
 
-  drone_fly = new Audio("/audio/enemy/drone/1.mp3");
+  drone_fly = new Audio('/audio/enemy/drone/1.mp3')
 
-  height = 55;
-  width = 55;
-  lastDropTick = 0;
-  lastDropTime = 0;
-  randomDropBombDelay = 1000;
-  horizontalSpeedDrone = 1.68;
-  characterUnderDrone = false;
-  droneMoveLeft = true;
+  height = 55
+  width = 55
+  lastDropTick = 0
+  lastDropTime = 0
+  randomDropBombDelay = 1000
+  horizontalSpeedDrone = 1.68
+  characterUnderDrone = false
+  droneMoveLeft = true
 
   /**
    * Creates a new drone character.
    */
   constructor() {
-    super().loadImg("/img/characters/drone/idle/004-000.png");
-    this.loadImages(this.IMG_WALKING);
-    this.loadImages(this.IMG_IDLE);
-    this.x = 4000;
-    this.y = 60;
-    this.drone_fly.loop = true;
-    this.speedX = this.horizontalSpeedDrone;
+    super().loadImg('/img/characters/drone/idle/004-000.png')
+    this.loadImages(this.IMG_WALKING)
+    this.loadImages(this.IMG_IDLE)
+    this.x = 4000
+    this.y = 60
+    this.drone_fly.loop = true
+    this.speedX = this.horizontalSpeedDrone
   }
 
   /**
    * Main loop function that updates the drone's state.
    */
   objLoop() {
-    this.handleObjMovement();
-    this.handleObjAnimation();
-    this.adjustSoundVolumeByDistance(world.character, this);
+    this.handleObjMovement()
+    this.handleObjAnimation()
+    this.adjustSoundVolumeByDistance(world.character, this)
   }
 
   /**
@@ -45,9 +45,9 @@ class Drone extends MovableObject {
    */
   handleObjAnimation() {
     if (this.objMoves()) {
-      this.playAnimation(this.IMG_WALKING, 120);
+      this.playAnimation(this.IMG_WALKING, 120)
     } else {
-      this.playAnimation(this.IMG_IDLE, 120);
+      this.playAnimation(this.IMG_IDLE, 120)
     }
   }
 
@@ -56,16 +56,16 @@ class Drone extends MovableObject {
    */
   handleObjMovement() {
     if (this.x < 2000) {
-      this.droneMoveLeft = false;
+      this.droneMoveLeft = false
     } else if (this.x > 4000) {
-      this.droneMoveLeft = true;
+      this.droneMoveLeft = true
     }
     if (this.droneMoveLeft) {
-      this.moveLeft(this.speedX, true);
+      this.moveLeft(this.speedX, true)
     } else {
-      this.moveRight(this.speedX);
+      this.moveRight(this.speedX)
     }
-    this.playSound(this.drone_fly, 0.3, soundVolumeGame);
+    this.playSound(this.drone_fly, 0.3, soundVolumeGame)
   }
 
   /**
@@ -73,9 +73,9 @@ class Drone extends MovableObject {
    * @param {Object} world - The game world object.
    */
   dropBomb(world) {
-    this.speedX = 0;
-    const dropTick = gameLoopTicks;
-    this.checkAndResume(world, dropTick);
+    this.speedX = 0
+    const dropTick = gameLoopTicks
+    this.checkAndResume(world, dropTick)
   }
 
   /**
@@ -84,14 +84,14 @@ class Drone extends MovableObject {
    * @param {number} dropTick - The tick count when the bomb was dropped.
    */
   checkAndResume(world, dropTick) {
-    const elapsedTicks = gameLoopTicks - dropTick;
+    const elapsedTicks = gameLoopTicks - dropTick
     if (elapsedTicks >= 166) {
       world.throwableObjects.push(
         new Bomb(this.x + this.width / 4, this.y + this.height / 2, 0, 0, 30, world)
-      );
-      this.speedX = this.horizontalSpeedDrone;
+      )
+      this.speedX = this.horizontalSpeedDrone
     } else {
-      requestAnimationFrame(() => (!this.gamePaused ? this.checkAndResume(world, dropTick) : null));
+      requestAnimationFrame(() => (!this.gamePaused ? this.checkAndResume(world, dropTick) : null))
     }
   }
 
@@ -101,9 +101,9 @@ class Drone extends MovableObject {
    */
   droneDropBomb(world) {
     if (gameLoopTicks - this.lastDropTick >= 130 || this.characterUnderDrone) {
-      this.dropBomb(world);
-      this.randomDropBombDelay = 130 + Math.floor(Math.random() * 130);
-      this.lastDropTick = gameLoopTicks;
+      this.dropBomb(world)
+      this.randomDropBombDelay = 130 + Math.floor(Math.random() * 130)
+      this.lastDropTick = gameLoopTicks
     }
   }
 
@@ -113,7 +113,7 @@ class Drone extends MovableObject {
    */
   initDropBomb(world) {
     if (gameLoopTicks - this.lastDropTick >= this.randomDropBombDelay || this.characterUnderDrone) {
-      this.droneDropBomb(world);
+      this.droneDropBomb(world)
     }
   }
 
@@ -122,15 +122,15 @@ class Drone extends MovableObject {
    * @param {Object} character - The character object.
    */
   checkIfCharacterIsUnderDrone(character) {
-    let characterX = Math.floor(character.x + character.width / 2);
-    let droneX = Math.floor(this.x + this.width / 2);
+    let characterX = Math.floor(character.x + character.width / 2)
+    let droneX = Math.floor(this.x + this.width / 2)
     if (characterX === droneX) {
-      this.characterUnderDrone = true;
+      this.characterUnderDrone = true
       setTimeout(() => {
-        this.characterUnderDrone = false;
-      }, 20);
+        this.characterUnderDrone = false
+      }, 20)
     } else {
-      this.characterUnderDrone = false;
+      this.characterUnderDrone = false
     }
   }
 }
